@@ -33,19 +33,30 @@ const mockProvider: AiProvider = {
   },
 };
 
+function stripJsonFence(text: string): string {
+  const trimmed = text.trim();
+  // Gemini often wraps JSON in ```json ... ``` fences. Strip them.
+  const fenced = trimmed.match(/^```(?:json)?\s*([\s\S]*?)\s*```$/);
+  if (fenced) return fenced[1].trim();
+  return trimmed;
+}
+
 async function geminiProvider(): Promise<AiProvider> {
   const { GoogleGenerativeAI } = await import("@google/generative-ai");
   const client = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY as string);
-  const model = client.getGenerativeModel({ model: "gemini-1.5-flash" });
+  const model = client.getGenerativeModel({
+    model: "gemini-1.5-flash",
+    generationConfig: { responseMimeType: "application/json" },
+  });
   return {
     name: "gemini",
     async complete({ system, user, json }) {
       const t = Date.now();
-      const prompt = [system, user, json ? "Respond ONLY with valid JSON." : ""]
+      const prompt = [system, user, json ? "Respond ONLY with valid JSON. No markdown fences." : ""]
         .filter(Boolean)
         .join("\n\n");
       const res = await model.generateContent(prompt);
-      const text = res.response.text();
+      const text = json ? stripJsonFence(res.response.text()) : res.response.text();
       return { text, provider: "gemini", ms: Date.now() - t };
     },
   };
