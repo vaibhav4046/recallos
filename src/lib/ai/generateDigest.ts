@@ -1,4 +1,5 @@
 import { getProvider } from "./provider";
+import { stripMarkdown } from "../utils";
 
 export interface DigestInput {
   items: { title: string; summary?: string | null; category?: string | null }[];
@@ -17,14 +18,16 @@ function fallback(input: DigestInput): DigestResult {
   const top = input.items.slice(0, 3).map((i) => i.title);
   const buildable = input.projects.slice(0, 2).map((p) => p.title);
   const due = input.reminders.slice(0, 2).map((r) => r.title);
-  const bullets = [
-    top.length ? `Top captures: ${top.join("; ")}` : "No new captures today",
-    buildable.length ? `Ready to build: ${buildable.join(", ")}` : "No new project ideas",
-    due.length ? `Due soon: ${due.join(", ")}` : "No reminders due",
-  ];
+  const bullets: string[] = [];
+  if (top.length) bullets.push(`Top captures: ${top.join("; ")}`);
+  else bullets.push("Capture a link or note to seed today's digest.");
+  if (buildable.length) bullets.push(`Ready to build: ${buildable.join(", ")}`);
+  else bullets.push("Triage your inbox to surface project ideas.");
+  if (due.length) bullets.push(`Due soon: ${due.join(", ")}`);
+  else bullets.push("No reminders due — your memory is healthy.");
   return {
     headline: "Your daily Musemint digest",
-    bullets,
+    bullets: bullets.map(stripMarkdown),
     cta: buildable[0]
       ? `Open the build pack for "${buildable[0]}"`
       : "Capture something new from the share sheet",
@@ -52,9 +55,11 @@ export async function generateDigest(input: DigestInput): Promise<DigestResult> 
     const res = await provider.complete({ system: SYSTEM, user, json: true });
     const parsed = JSON.parse(res.text);
     return {
-      headline: String(parsed.headline ?? "Your daily Musemint digest"),
-      bullets: Array.isArray(parsed.bullets) ? parsed.bullets.map(String) : fallback(input).bullets,
-      cta: String(parsed.cta ?? "Open the inbox"),
+      headline: stripMarkdown(String(parsed.headline ?? "Your daily Musemint digest")),
+      bullets: Array.isArray(parsed.bullets)
+        ? parsed.bullets.map((b: unknown) => stripMarkdown(String(b)))
+        : fallback(input).bullets,
+      cta: stripMarkdown(String(parsed.cta ?? "Open the inbox")),
       provider: provider.name,
     };
   } catch {

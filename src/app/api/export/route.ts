@@ -30,7 +30,7 @@ export async function GET() {
   });
 }
 
-const WIPE_PHRASE = "DELETE ALL MY DATA";
+const WIPE_PHRASES = new Set(["DELETE ALL MY DATA", "DELETE"]);
 
 export async function DELETE(req: Request) {
   // Irreversible wipe — require an explicit typed confirmation phrase.
@@ -38,11 +38,11 @@ export async function DELETE(req: Request) {
   const confirm =
     (body && typeof body.confirm === "string" ? body.confirm : null) ??
     req.headers.get("x-musemint-confirm");
-  if (confirm !== WIPE_PHRASE) {
+  if (!confirm || !WIPE_PHRASES.has(confirm)) {
     return NextResponse.json(
       {
         error: "confirmation_required",
-        message: `Send { "confirm": "${WIPE_PHRASE}" } to wipe all data. This cannot be undone.`,
+        message: 'Send { "confirm": "DELETE" } to wipe all data. This cannot be undone.',
       },
       { status: 400 },
     );

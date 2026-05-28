@@ -20,11 +20,24 @@ interface KeyStatus {
   configured: boolean;
 }
 
+const PROVIDER_LABELS: Record<string, string> = {
+  gemini: "Google Gemini",
+  openai: "OpenAI",
+  anthropic: "Anthropic Claude",
+  groq: "Groq",
+  mistral: "Mistral",
+  youtube: "YouTube enrichment",
+  mock: "Offline (built-in)",
+};
+
 export default function SettingsPage() {
   const toast = useToast();
   const [keys, setKeys] = useState<KeyStatus[] | null>(null);
   const [localFirst, setLocalFirst] = useState(true);
   const [activeProvider, setActiveProvider] = useState<string>("mock");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deletePhrase, setDeletePhrase] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     fetch("/api/settings")
@@ -38,26 +51,29 @@ export default function SettingsPage() {
   async function exportData() {
     window.location.href = "/api/export";
   }
-  async function deleteData() {
-    const phrase = window.prompt(
-      'This permanently wipes ALL captures, projects, prompts, and reminders. This cannot be undone.\n\nType "DELETE ALL MY DATA" to confirm:',
-    );
-    if (phrase !== "DELETE ALL MY DATA") {
-      if (phrase !== null) {
-        toast({ kind: "error", title: "Not wiped", body: "Confirmation phrase did not match." });
+
+  function openDeleteModal() {
+    setDeletePhrase("");
+    setShowDeleteModal(true);
+  }
+
+  async function confirmDelete() {
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/export", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ confirm: "DELETE ALL MY DATA" }),
+      });
+      if (!res.ok) {
+        toast({ kind: "error", title: "Wipe failed", body: "Please try again." });
+        return;
       }
-      return;
+      toast({ kind: "success", title: "Memory wiped", body: "All captures, projects, and prompts are gone." });
+      setShowDeleteModal(false);
+    } finally {
+      setDeleting(false);
     }
-    const res = await fetch("/api/export", {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ confirm: phrase }),
-    });
-    if (!res.ok) {
-      toast({ kind: "error", title: "Wipe failed", body: "Please try again." });
-      return;
-    }
-    toast({ kind: "success", title: "Memory wiped", body: "Run the seed script to restore demo data." });
   }
 
   return (
@@ -77,10 +93,13 @@ export default function SettingsPage() {
         <Card>
           <CardHeader
             title="AI providers"
-            description="Musemint picks the first configured key. Mock provider runs fully offline."
+            description="Musemint uses the first connected provider. Offline mode keeps everything on-device."
             right={
               <Badge tone={activeProvider === "mock" ? "muted" : "accent"}>
-                <Bot className="h-3 w-3" /> Active: {activeProvider}
+                <Bot className="h-3 w-3" />{" "}
+                {activeProvider === "mock"
+                  ? "Offline mode"
+                  : `Live · ${PROVIDER_LABELS[activeProvider] ?? activeProvider}`}
               </Badge>
             }
           />
@@ -93,24 +112,25 @@ export default function SettingsPage() {
                 <div className="flex items-center gap-3">
                   <KeyRound className={`h-4 w-4 ${k.configured ? "text-success" : "text-ink-mute"}`} />
                   <div>
-                    <div className="text-sm font-semibold text-ink capitalize">{k.provider}</div>
+                    <div className="text-sm font-semibold text-ink">
+                      {PROVIDER_LABELS[k.provider] ?? k.provider}
+                    </div>
                     <div className="text-xs text-ink-mute">
-                      {k.configured ? "Key detected (value hidden)" : "Set the env variable to enable"}
+                      {k.configured
+                        ? "Connected · credentials never leave this device"
+                        : "Not connected"}
                     </div>
                   </div>
                 </div>
                 <Badge tone={k.configured ? "success" : "muted"}>
-                  {k.configured ? "Configured" : "Not set"}
+                  {k.configured ? "Connected" : "Available"}
                 </Badge>
               </li>
             ))}
           </ul>
           <p className="mt-3 text-xs text-ink-mute">
-            Set <code className="rounded bg-bg-soft px-1 py-0.5">GOOGLE_API_KEY</code>,{" "}
-            <code className="rounded bg-bg-soft px-1 py-0.5">OPENAI_API_KEY</code>,{" "}
-            <code className="rounded bg-bg-soft px-1 py-0.5">ANTHROPIC_API_KEY</code>, or{" "}
-            <code className="rounded bg-bg-soft px-1 py-0.5">GROQ_API_KEY</code> in{" "}
-            <code className="rounded bg-bg-soft px-1 py-0.5">.env</code>.
+            Musemint will run fully offline using the built-in summarizer if no provider is connected.
+            Connect a provider to upgrade quality — keys stay in your local environment.
           </p>
         </Card>
 
@@ -190,7 +210,7 @@ export default function SettingsPage() {
         </Card>
         <Card>
           <CardHeader title="Delete memory" description="Wipe captures, projects, prompts, reminders" right={<Trash2 className="h-5 w-5 text-danger" />} />
-          <Button variant="danger" onClick={deleteData}>
+          <Button variant="danger" onClick={openDeleteModal}>
             <Trash2 className="h-4 w-4" /> Delete everything
           </Button>
         </Card>
@@ -201,6 +221,65 @@ export default function SettingsPage() {
           </Button>
         </Card>
       </section>
+
+      {showDeleteModal ? (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="delete-modal-title"
+        >
+          <div
+            className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            onClick={() => !deleting && setShowDeleteModal(false)}
+          />
+          <div className="relative w-full max-w-md panel border-danger/40 bg-bg-raised/95 p-5 shadow-glow">
+            <div className="flex items-start gap-3">
+              <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-danger/40 bg-danger/10 text-danger">
+                <Trash2 className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <h2 id="delete-modal-title" className="text-base font-semibold text-ink">
+                  Delete all Musemint data?
+                </h2>
+                <p className="mt-1 text-sm text-ink-soft">
+                  This permanently wipes every capture, project brief, prompt, reminder, and
+                  build pack. Export first if you want a backup. This cannot be undone.
+                </p>
+              </div>
+            </div>
+            <label className="mt-4 block text-xs uppercase tracking-wider text-ink-mute">
+              Type <span className="font-mono text-danger">DELETE</span> to confirm
+            </label>
+            <input
+              type="text"
+              autoFocus
+              value={deletePhrase}
+              onChange={(e) => setDeletePhrase(e.target.value)}
+              placeholder="DELETE"
+              className="input mt-1"
+              aria-label="Type DELETE to confirm"
+            />
+            <div className="mt-5 flex items-center justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setShowDeleteModal(false)}
+                disabled={deleting}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                disabled={deletePhrase.trim() !== "DELETE" || deleting}
+                onClick={confirmDelete}
+              >
+                <Trash2 className="h-4 w-4" />
+                {deleting ? "Deleting…" : "Delete everything"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
