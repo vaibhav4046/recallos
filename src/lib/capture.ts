@@ -2,6 +2,7 @@ import { z } from "zod";
 import { prisma, getDemoUser } from "./prisma";
 import { detectPlatform } from "./utils";
 import { processItem } from "./ai/processItem";
+import { fetchYouTubeMetadata } from "./enrich/youtube";
 
 export const CaptureSchema = z.object({
   kind: z.enum([
@@ -56,22 +57,33 @@ function deriveTitle(input: CaptureInput): string {
 
 export async function createCapture(input: CaptureInput) {
   const user = await getDemoUser();
-  const title = deriveTitle(input);
   const sourcePlatform =
     detectPlatform(input.url) || (input.kind === "note" ? "note" : input.kind);
+
+  // YouTube enrichment — pulls real title, channel, description, duration, views.
+  let youtube: Awaited<ReturnType<typeof fetchYouTubeMetadata>> = null;
+  if (sourcePlatform === "youtube" && input.url) {
+    youtube = await fetchYouTubeMetadata(input.url);
+  }
+
+  const enrichedTitle = youtube?.title || deriveTitle(input);
+  const enrichedRaw = youtube
+    ? [youtube.description, input.rawContent].filter(Boolean).join("\n\n")
+    : input.rawContent ?? null;
 
   let processed:
     | Awaited<ReturnType<typeof processItem>>
     | null = null;
   if (input.process) {
     processed = await processItem({
-      title,
+      title: enrichedTitle,
       url: input.url ?? null,
-      rawContent: input.rawContent ?? null,
+      rawContent: enrichedRaw,
       kind: input.kind,
       intent: input.intent,
     });
   }
+  const title = enrichedTitle;
 
   const tags = processed?.tags ?? [];
   const tagRecords = await Promise.all(
@@ -86,12 +98,23 @@ export async function createCapture(input: CaptureInput) {
       kind: input.kind,
       sourcePlatform: processed?.sourcePlatform ?? sourcePlatform,
       url: input.url || null,
-      rawContent: input.rawContent || null,
+      rawContent: enrichedRaw,
       title,
       summary: processed?.summary ?? null,
       category: processed?.category ?? null,
       tagsJson: JSON.stringify(tags),
-      metadataJson: "{}",
+      metadataJson: JSON.stringify(
+        youtube
+          ? {
+              channel: youtube.channel,
+              publishedAt: youtube.publishedAt,
+              durationSec: youtube.durationSec,
+              viewCount: youtube.viewCount,
+              thumbnail: youtube.thumbnail,
+              videoId: youtube.videoId,
+            }
+          : {},
+      ),
       scoresJson: JSON.stringify(
         processed?.scores ?? {
           usefulness: 0,

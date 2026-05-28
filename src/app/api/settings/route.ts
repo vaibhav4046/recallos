@@ -10,6 +10,8 @@ export async function GET() {
     { provider: "openai", configured: !!process.env.OPENAI_API_KEY },
     { provider: "anthropic", configured: !!process.env.ANTHROPIC_API_KEY },
     { provider: "groq", configured: !!process.env.GROQ_API_KEY },
+    { provider: "mistral", configured: !!process.env.MISTRAL_API_KEY },
+    { provider: "youtube", configured: !!process.env.YOUTUBE_API_KEY },
   ];
   return NextResponse.json({ keys, active: activeProviderName() });
 }

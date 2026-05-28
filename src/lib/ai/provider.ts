@@ -1,4 +1,4 @@
-export type AiProviderName = "gemini" | "openai" | "anthropic" | "groq" | "mock";
+export type AiProviderName = "gemini" | "openai" | "anthropic" | "groq" | "mistral" | "mock";
 
 export interface AiCompletion {
   text: string;
@@ -16,6 +16,7 @@ function pickProvider(): AiProviderName {
   if (process.env.OPENAI_API_KEY) return "openai";
   if (process.env.ANTHROPIC_API_KEY) return "anthropic";
   if (process.env.GROQ_API_KEY) return "groq";
+  if (process.env.MISTRAL_API_KEY) return "mistral";
   return "mock";
 }
 
@@ -133,6 +134,33 @@ async function groqProvider(): Promise<AiProvider> {
   };
 }
 
+async function mistralProvider(): Promise<AiProvider> {
+  const { Mistral } = await import("@mistralai/mistralai");
+  const client = new Mistral({ apiKey: process.env.MISTRAL_API_KEY as string });
+  return {
+    name: "mistral",
+    async complete({ system, user, json }) {
+      const t = Date.now();
+      const res = await client.chat.complete({
+        model: "mistral-small-latest",
+        messages: [
+          ...(system ? [{ role: "system" as const, content: system }] : []),
+          { role: "user" as const, content: user },
+        ],
+        responseFormat: json ? { type: "json_object" } : undefined,
+        temperature: 0.4,
+      });
+      const content = res.choices?.[0]?.message?.content ?? "";
+      const text = typeof content === "string"
+        ? content
+        : Array.isArray(content)
+          ? content.map((c) => ("text" in c ? c.text : "")).join("\n")
+          : "";
+      return { text, provider: "mistral", ms: Date.now() - t };
+    },
+  };
+}
+
 export async function getProvider(): Promise<AiProvider> {
   const name = pickProvider();
   try {
@@ -140,6 +168,7 @@ export async function getProvider(): Promise<AiProvider> {
     if (name === "openai") return await openaiProvider();
     if (name === "anthropic") return await anthropicProvider();
     if (name === "groq") return await groqProvider();
+    if (name === "mistral") return await mistralProvider();
   } catch (err) {
     console.warn(`[ai] provider ${name} init failed, using mock`, err);
   }
