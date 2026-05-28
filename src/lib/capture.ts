@@ -6,37 +6,73 @@ import { fetchYouTubeMetadata } from "./enrich/youtube";
 import { embedText, vectorLiteral } from "./embed";
 import { describeImage } from "./ai/vision";
 
-export const CaptureSchema = z.object({
-  kind: z.enum([
-    "url",
-    "note",
-    "prompt",
-    "screenshot",
-    "youtube",
-    "linkedin",
-    "instagram",
-    "github",
-    "article",
-    "text",
-  ]),
-  url: z.string().url().optional().or(z.literal("")).optional(),
-  title: z.string().min(1).max(280).optional(),
-  rawContent: z.string().max(20_000).optional(),
-  imageData: z.string().max(9_000_000).optional(),
-  intent: z
-    .enum([
-      "remember",
-      "project",
+const URL_KINDS = new Set(["url", "youtube", "linkedin", "instagram", "github", "article"]);
+const TEXT_KINDS = new Set(["note", "prompt", "text"]);
+
+export const CaptureSchema = z
+  .object({
+    kind: z.enum([
+      "url",
+      "note",
       "prompt",
-      "learn",
-      "jobsearch",
-      "reminder",
-      "summarize",
-      "auto",
-    ])
-    .default("auto"),
-  process: z.boolean().default(true),
-});
+      "screenshot",
+      "youtube",
+      "linkedin",
+      "instagram",
+      "github",
+      "article",
+      "text",
+    ]),
+    url: z.string().url().optional().or(z.literal("")).optional(),
+    title: z.string().min(1).max(280).optional(),
+    rawContent: z.string().max(20_000).optional(),
+    imageData: z.string().max(9_000_000).optional(),
+    intent: z
+      .enum([
+        "remember",
+        "project",
+        "prompt",
+        "learn",
+        "jobsearch",
+        "reminder",
+        "summarize",
+        "auto",
+      ])
+      .default("auto"),
+    process: z.boolean().default(true),
+  })
+  .superRefine((data, ctx) => {
+    const url = data.url?.trim();
+    const raw = data.rawContent?.trim();
+    const title = data.title?.trim();
+    const hasImage = !!data.imageData && data.imageData.length > 100;
+
+    if (URL_KINDS.has(data.kind)) {
+      if (!url && !raw && !title) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `A ${data.kind} capture needs a URL, title, or notes.`,
+          path: ["url"],
+        });
+      }
+    } else if (TEXT_KINDS.has(data.kind)) {
+      if (!raw && !title) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `A ${data.kind} capture needs body content or a title.`,
+          path: ["rawContent"],
+        });
+      }
+    } else if (data.kind === "screenshot") {
+      if (!hasImage && !raw && !title) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "A screenshot capture needs an image, notes, or a title.",
+          path: ["imageData"],
+        });
+      }
+    }
+  });
 
 export type CaptureInput = z.infer<typeof CaptureSchema>;
 

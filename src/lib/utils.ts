@@ -65,6 +65,26 @@ export function platformLabel(platform: string): string {
   return map[platform] ?? platform;
 }
 
+/**
+ * Strip common markdown markers so AI-generated copy renders cleanly as plain text.
+ * Handles **bold**, *italic*, _italic_, `code`, leading list bullets and ATX headers.
+ */
+export function stripMarkdown(input: string): string {
+  if (!input) return "";
+  return input
+    .replace(/^\s{0,3}#{1,6}\s+/gm, "")
+    .replace(/^\s*[-*+]\s+/gm, "")
+    .replace(/^\s*\d+\.\s+/gm, "")
+    .replace(/\*\*(.+?)\*\*/g, "$1")
+    .replace(/__([^_]+)__/g, "$1")
+    .replace(/(^|[^*])\*([^*\n]+)\*/g, "$1$2")
+    .replace(/(^|[^_])_([^_\n]+)_/g, "$1$2")
+    .replace(/`([^`]+)`/g, "$1")
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1")
+    .trim();
+}
+
 export function slugify(s: string): string {
   return s
     .toLowerCase()

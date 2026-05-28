@@ -6,7 +6,7 @@ import { Badge, ScoreBar } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
-import { Hammer, Sparkles, ArrowRight, GitBranch, Clock, Cpu } from "lucide-react";
+import { Hammer, Sparkles, ArrowRight, GitBranch, Clock, Cpu, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Project = {
@@ -40,11 +40,20 @@ export default function ReadyToBuildPage() {
 
   async function onGenerate(projectId: string) {
     setBusyId(projectId);
+    toast({
+      kind: "info",
+      title: "Drafting your build pack",
+      body: "Musemint is synthesizing README, schema, and a shipping checklist — usually 8-15 seconds.",
+    });
     try {
       const res = await fetch(`/api/projects/${projectId}/build-pack`, { method: "POST" });
       if (!res.ok) throw new Error("Generation failed");
       const { buildPack } = await res.json();
-      toast({ kind: "success", title: "Build pack ready", body: "Opening generated brief…" });
+      toast({
+        kind: "success",
+        title: "Build pack ready",
+        body: "Portfolio-grade brief drafted. Opening now…",
+      });
       router.push(`/build-packs/${buildPack.id}`);
     } catch (err: any) {
       toast({ kind: "error", title: "Build pack failed", body: err.message });
@@ -70,6 +79,20 @@ export default function ReadyToBuildPage() {
           <Sparkles className="h-4 w-4" /> Generate from inbox
         </Link>
       </header>
+
+      {busyId ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="panel flex items-center gap-3 border border-accent/30 bg-accent/[0.06] p-3 text-sm text-ink-soft"
+        >
+          <Loader2 className="h-4 w-4 animate-spin text-accent" />
+          <span>
+            Drafting README, API contract, schema, and a shipping checklist for your
+            project. Usually 8-15 seconds — feel free to keep browsing.
+          </span>
+        </div>
+      ) : null}
 
       {projects === null ? (
         <div className="grid gap-4 md:grid-cols-2">
@@ -127,9 +150,19 @@ export default function ReadyToBuildPage() {
                 <Button
                   variant="primary"
                   onClick={() => onGenerate(p.id)}
-                  disabled={busyId === p.id}
+                  disabled={busyId !== null}
                 >
-                  {busyId === p.id ? "Generating…" : (
+                  {busyId === p.id ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      Drafting build pack…
+                    </>
+                  ) : busyId ? (
+                    <>
+                      <Hammer className="h-4 w-4" />
+                      Generate Build Pack
+                    </>
+                  ) : (
                     <>
                       <Hammer className="h-4 w-4" />
                       Generate Build Pack
