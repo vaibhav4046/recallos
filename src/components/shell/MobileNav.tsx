@@ -73,10 +73,13 @@ export function MobileNav() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm",
-                active ? "bg-bg-soft text-ink" : "text-ink-soft hover:bg-bg-soft/60 hover:text-ink",
+                "relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm transition-colors",
+                active ? "bg-accent/10 text-ink" : "text-ink-soft hover:bg-bg-soft/60 hover:text-ink",
               )}
             >
+              {active ? (
+                <span className="absolute inset-y-1.5 left-0 w-0.5 rounded-full bg-accent" />
+              ) : null}
               <Icon className={cn("h-4 w-4", active ? "text-accent" : "text-ink-mute")} />
               <span>{item.label}</span>
             </Link>

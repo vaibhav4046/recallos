@@ -54,7 +54,7 @@ export function Stat({
   accent?: boolean;
 }) {
   return (
-    <div className={cn("panel-soft p-4")}>
+    <div className={cn("panel-soft p-4 transition-colors hover:border-line-strong")}>
       <div className="field-label">{label}</div>
       <div
         className={cn(

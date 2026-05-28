@@ -58,7 +58,7 @@ export function ItemCard({
   compact?: boolean;
 }) {
   return (
-    <article className="panel p-4 transition-colors hover:border-line-strong">
+    <article className="panel card-hover p-4">
       <header className="flex items-start gap-3">
         <PlatformGlyph platform={item.sourcePlatform} />
         <div className="min-w-0 flex-1">
