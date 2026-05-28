@@ -60,14 +60,14 @@ export default function MobilePage() {
       <header className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <div className="field-label flex items-center gap-1.5">
-            <Smartphone className="h-3.5 w-3.5" /> RecallOS on your phone
+            <Smartphone className="h-3.5 w-3.5" /> Musemint on your phone
           </div>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight text-ink text-balance">
             Save from Instagram with one <span className="text-accent">Share</span>.
           </h1>
           <p className="mt-2 max-w-xl text-sm text-ink-mute">
-            Install RecallOS once. Then in Instagram, YouTube, or any app, tap{" "}
-            <span className="text-ink-soft">Share → RecallOS</span> — your post lands in your
+            Install Musemint once. Then in Instagram, YouTube, or any app, tap{" "}
+            <span className="text-ink-soft">Share → Musemint</span> — your post lands in your
             inbox, auto-classified and scored. No logins, no scraping.
           </p>
         </div>
@@ -78,7 +78,7 @@ export default function MobilePage() {
             </span>
           ) : installEvt ? (
             <button onClick={doInstall} className="btn-primary">
-              <Download className="h-4 w-4" /> Install RecallOS
+              <Download className="h-4 w-4" /> Install Musemint
             </button>
           ) : (
             <span className="chip">Open in Safari/Chrome on your phone to install</span>
@@ -115,7 +115,7 @@ export default function MobilePage() {
               </div>
               <div className="rounded-2xl border border-accent/40 bg-accent/15 p-3 shadow-glow">
                 <div className="flex items-center gap-2 text-accent">
-                  <Sparkles className="h-4 w-4" /> RecallOS
+                  <Sparkles className="h-4 w-4" /> Musemint
                 </div>
                 <p className="mt-1 text-xs text-ink-soft">Tap to save, classify & score.</p>
               </div>
@@ -143,13 +143,13 @@ export default function MobilePage() {
             },
             {
               icon: Sparkles,
-              title: "Choose RecallOS",
-              body: "RecallOS appears as a share target once installed. Tap it.",
+              title: "Choose Musemint",
+              body: "Musemint appears as a share target once installed. Tap it.",
             },
             {
               icon: Check,
               title: "It's in your inbox",
-              body: "RecallOS detects the platform, classifies, scores, and files it — instantly.",
+              body: "Musemint detects the platform, classifies, scores, and files it — instantly.",
             },
           ].map((s, i) => {
             const Icon = s.icon;
@@ -186,7 +186,7 @@ export default function MobilePage() {
             <li>1. Open <span className="text-ink">{origin || "this site"}</span> in Safari.</li>
             <li>2. Tap the <span className="text-ink">Share</span> button.</li>
             <li>3. Choose <span className="text-ink">Add to Home Screen</span>.</li>
-            <li>4. Launch RecallOS from your home screen — now it shows up in share sheets.</li>
+            <li>4. Launch Musemint from your home screen — now it shows up in share sheets.</li>
           </ol>
         </div>
         <div className="panel p-5">
@@ -197,7 +197,7 @@ export default function MobilePage() {
             <li>1. Open <span className="text-ink">{origin || "this site"}</span> in Chrome.</li>
             <li>2. Tap the <span className="text-ink">Install</span> button above, or ⋮ menu.</li>
             <li>3. Choose <span className="text-ink">Install app</span> / Add to Home screen.</li>
-            <li>4. RecallOS now appears when you tap Share in any app.</li>
+            <li>4. Musemint now appears when you tap Share in any app.</li>
           </ol>
         </div>
       </section>
@@ -210,10 +210,10 @@ export default function MobilePage() {
         <p className="mt-2 text-sm text-ink-mute">
           Prefer Apple Shortcuts? Create one that receives URLs from the share sheet and opens{" "}
           <code className="rounded bg-bg-soft px-1.5 py-0.5 text-xs text-ink-soft">
-            {origin || "https://your-recallos"}/share?url=
+            {origin || "https://your-musemint"}/share?url=
           </code>
           followed by the shared link. Sharing from Instagram then routes straight through the
-          RecallOS capture pipeline.
+          Musemint capture pipeline.
         </p>
       </section>
 
@@ -243,7 +243,7 @@ export default function MobilePage() {
       <div className="panel-soft flex items-start gap-3 p-4 text-sm text-ink-mute">
         <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
         <p>
-          RecallOS never logs into Instagram or LinkedIn and never scrapes private data. Saved
+          Musemint never logs into Instagram or LinkedIn and never scrapes private data. Saved
           posts arrive only through the official share sheet, pasted links, or screenshot OCR —
           exactly the same as a human tap.
         </p>
@@ -260,7 +260,7 @@ function PhoneFrame({ children }: { children: React.ReactNode }) {
         <div className="mt-6 flex items-center justify-between text-[10px] text-ink-mute">
           <span>9:41</span>
           <span className="inline-flex items-center gap-1">
-            <Sparkles className="h-3 w-3 text-accent" /> RecallOS
+            <Sparkles className="h-3 w-3 text-accent" /> Musemint
           </span>
         </div>
         <div className="mt-3">{children}</div>

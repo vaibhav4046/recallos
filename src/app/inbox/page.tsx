@@ -169,7 +169,7 @@ export default function InboxPage() {
         <div>
           <div className="field-label">AI Inbox</div>
           <h1 className="mt-1 text-3xl font-semibold tracking-tight text-ink">
-            Triage in seconds — RecallOS already did the heavy lift.
+            Triage in seconds — Musemint already did the heavy lift.
           </h1>
           <p className="mt-2 max-w-xl text-sm text-ink-mute">
             Each card is scored for usefulness, actionability, and portfolio value.

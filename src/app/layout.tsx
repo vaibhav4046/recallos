@@ -9,15 +9,15 @@ import { ToastProvider } from "@/components/ui/Toast";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 
 export const metadata: Metadata = {
-  applicationName: "RecallOS",
-  title: "RecallOS · Stop saving. Start building.",
+  applicationName: "Musemint",
+  title: "Musemint · Stop saving. Start building.",
   description:
-    "RecallOS turns saved YouTube videos, LinkedIn posts, screenshots, and links into project briefs, prompts, and shipping work.",
+    "Musemint turns saved YouTube videos, LinkedIn posts, screenshots, and links into project briefs, prompts, and shipping work.",
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "RecallOS",
+    title: "Musemint",
   },
   icons: {
     icon: [

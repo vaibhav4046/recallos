@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 
 /**
- * Registers the service worker so RecallOS is installable as a PWA and can be
+ * Registers the service worker so Musemint is installable as a PWA and can be
  * a share target on mobile. Renders nothing.
  */
 export function ServiceWorkerRegister() {

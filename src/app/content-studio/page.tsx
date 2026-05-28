@@ -16,11 +16,11 @@ export const dynamic = "force-dynamic";
 const LINKEDIN_POSTS = [
   {
     hook: "I stopped saving and started shipping. Here's what changed.",
-    body: "For 6 months I hoarded LinkedIn carousels, YouTube tutorials, and GitHub repos — and built nothing. Then I built RecallOS to flip the equation. In week 1: 3 portfolio projects, 18 reusable prompts, 12 callbacks.",
+    body: "For 6 months I hoarded LinkedIn carousels, YouTube tutorials, and GitHub repos — and built nothing. Then I built Musemint to flip the equation. In week 1: 3 portfolio projects, 18 reusable prompts, 12 callbacks.",
   },
   {
     hook: "Your saved tabs are a backlog, not a library.",
-    body: "Every save is a decision deferred. RecallOS converts each capture into one of: project, prompt, learning sprint, job-search action, or — if it deserves it — archive.",
+    body: "Every save is a decision deferred. Musemint converts each capture into one of: project, prompt, learning sprint, job-search action, or — if it deserves it — archive.",
   },
 ];
 
@@ -28,7 +28,7 @@ const X_THREADS = [
   {
     topic: "Stop saving. Start building.",
     tweets: [
-      "1/ I built RecallOS — an AI memory and execution system. It turned 6 months of saved content into 3 shipping projects in a weekend.",
+      "1/ I built Musemint — an AI memory and execution system. It turned 6 months of saved content into 3 shipping projects in a weekend.",
       "2/ The unlock: every capture gets scored on usefulness × actionability × portfolio value. No more 'I'll get to it'.",
       "3/ Stack: Next.js App Router, Prisma, Tailwind, pluggable provider (Gemini → OpenAI → Anthropic → Groq → mock).",
       "4/ Lessons: the inbox is the product. If triage feels heavy, your scoring is wrong.",
@@ -43,7 +43,7 @@ const BLOG_OUTLINES = [
     sections: [
       "The save-button trap",
       "Why save-then-forget breaks builders",
-      "What RecallOS does differently (scoring + intent)",
+      "What Musemint does differently (scoring + intent)",
       "Architecture walk-through",
       "What's next: MCP server, mobile share, Chrome extension",
     ],
@@ -84,7 +84,7 @@ export default async function ContentStudioPage() {
           Your saved memory, repackaged for <span className="text-accent">audience</span>.
         </h1>
         <p className="mt-2 max-w-xl text-sm text-ink-mute">
-          RecallOS turns every cluster of saves into LinkedIn posts, X threads, blog outlines,
+          Musemint turns every cluster of saves into LinkedIn posts, X threads, blog outlines,
           and YouTube scripts. Personal brand on autopilot — minus the slop.
         </p>
       </header>

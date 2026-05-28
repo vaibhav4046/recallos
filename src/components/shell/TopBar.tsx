@@ -131,7 +131,7 @@ export function TopBar() {
         <button
           aria-label="Open menu"
           className="btn-icon md:hidden"
-          onClick={() => document.dispatchEvent(new CustomEvent("recallos:mobile-nav"))}
+          onClick={() => document.dispatchEvent(new CustomEvent("musemint:mobile-nav"))}
         >
           <Menu className="h-4 w-4" />
         </button>

@@ -46,7 +46,7 @@ export default function PromptsPage() {
         body: JSON.stringify({ title, body, category, tags: [category] }),
       });
       if (!res.ok) throw new Error("Save failed");
-      toast({ kind: "success", title: "Prompt saved", body: "RecallOS improved and scored it." });
+      toast({ kind: "success", title: "Prompt saved", body: "Musemint improved and scored it." });
       setTitle("");
       setBody("");
       setOpen(false);
@@ -128,7 +128,7 @@ export default function PromptsPage() {
         <EmptyState
           icon={<Sparkles className="h-5 w-5" />}
           title="No prompts yet"
-          description="Save a prompt — RecallOS will improve, score, and tag it."
+          description="Save a prompt — Musemint will improve, score, and tag it."
           action={
             <Button variant="primary" onClick={() => setOpen(true)}>
               <Plus className="h-4 w-4" /> Create prompt

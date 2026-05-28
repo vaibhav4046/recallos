@@ -40,8 +40,8 @@ export function MobileNav() {
 
   useEffect(() => {
     const onOpen = () => setOpen(true);
-    document.addEventListener("recallos:mobile-nav", onOpen);
-    return () => document.removeEventListener("recallos:mobile-nav", onOpen);
+    document.addEventListener("musemint:mobile-nav", onOpen);
+    return () => document.removeEventListener("musemint:mobile-nav", onOpen);
   }, []);
 
   useEffect(() => {
@@ -57,9 +57,9 @@ export function MobileNav() {
         <div className="mb-2 flex items-center justify-between px-2 py-1">
           <div className="flex items-center gap-2">
             <div className="grid h-7 w-7 place-items-center rounded-lg border border-accent/40 bg-accent/10 text-accent">
-              <span className="font-mono text-xs font-bold">R</span>
+              <span className="font-mono text-xs font-bold">M</span>
             </div>
-            <span className="text-sm font-semibold">RecallOS</span>
+            <span className="text-sm font-semibold">Musemint</span>
           </div>
           <button onClick={() => setOpen(false)} aria-label="Close" className="btn-icon h-8 w-8">
             <X className="h-4 w-4" />

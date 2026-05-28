@@ -11,7 +11,7 @@ describe("utils", () => {
   });
 
   it("slugify produces url-safe slugs", () => {
-    expect(slugify("RecallOS · v1 design")).toBe("recallos-v1-design");
+    expect(slugify("Musemint · v1 design")).toBe("musemint-v1-design");
   });
 
   it("truncate respects max length", () => {

@@ -43,7 +43,7 @@ export function RightPanel() {
           <span className="ml-auto chip-accent">{insight?.provider ?? "mock"}</span>
         </div>
         <div className="text-base font-semibold tracking-tight text-ink">
-          {insight?.headline ?? "Your daily RecallOS digest"}
+          {insight?.headline ?? "Your daily Musemint digest"}
         </div>
         <ul className="mt-3 space-y-2">
           {(insight?.bullets ?? [

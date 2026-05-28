@@ -1,13 +1,13 @@
-# RecallOS Chrome Extension
+# Musemint Chrome Extension
 
-One-click capture from any web page into your RecallOS memory.
+One-click capture from any web page into your Musemint memory.
 
 ## Features
 
 - **Popup** — edit title/note/intent before saving.
 - **Right-click menu** — save page / selection / link in one click.
 - **Keyboard shortcut** — `Alt+Shift+R` saves the current tab instantly.
-- **Endpoint config** — defaults to the public RecallOS deployment; change in the popup to point at your own.
+- **Endpoint config** — defaults to the public Musemint deployment; change in the popup to point at your own.
 
 ## Install (developer mode)
 
@@ -21,7 +21,7 @@ One-click capture from any web page into your RecallOS memory.
 
 Default: `https://recallos-vaibhav4046s-projects.vercel.app`
 
-Click **change** in the popup to point at a self-hosted RecallOS (e.g. `http://localhost:3000`).
+Click **change** in the popup to point at a self-hosted Musemint (e.g. `http://localhost:3000`).
 
 ## Icons
 
@@ -33,7 +33,7 @@ Drop 16/48/128 PNG icons into `icons/`. The default extension will load without 
 [ active tab ]
       │
       ▼
-[ extension ] ── POST /api/capture ──▶ [ RecallOS ]
+[ extension ] ── POST /api/capture ──▶ [ Musemint ]
       │                                     │
       ▼                                     ▼
  toast / badge                        AI processing,

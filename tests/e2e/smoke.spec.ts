@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-test.describe("RecallOS smoke", () => {
+test.describe("Musemint smoke", () => {
   test("dashboard loads with hero", async ({ page }) => {
     await page.goto("/dashboard");
     await expect(
@@ -23,8 +23,8 @@ test.describe("RecallOS smoke", () => {
   test("capture form submits", async ({ page }) => {
     await page.goto("/capture?kind=note");
     await page.getByLabel("Title").fill("Playwright capture");
-    await page.locator("textarea").first().fill("RecallOS works end-to-end");
-    await page.getByRole("button", { name: /Save to RecallOS/ }).click();
+    await page.locator("textarea").first().fill("Musemint works end-to-end");
+    await page.getByRole("button", { name: /Save to Musemint/ }).click();
     await expect(page).toHaveURL(/\/inbox/, { timeout: 15_000 });
   });
 

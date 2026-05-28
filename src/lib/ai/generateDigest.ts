@@ -23,7 +23,7 @@ function fallback(input: DigestInput): DigestResult {
     due.length ? `Due soon: ${due.join(", ")}` : "No reminders due",
   ];
   return {
-    headline: "Your daily RecallOS digest",
+    headline: "Your daily Musemint digest",
     bullets,
     cta: buildable[0]
       ? `Open the build pack for "${buildable[0]}"`
@@ -32,7 +32,7 @@ function fallback(input: DigestInput): DigestResult {
   };
 }
 
-const SYSTEM = `You are RecallOS. Produce a tight 3-bullet daily digest as JSON:
+const SYSTEM = `You are Musemint. Produce a tight 3-bullet daily digest as JSON:
 { "headline": string, "bullets": string[3-4], "cta": string }`;
 
 export async function generateDigest(input: DigestInput): Promise<DigestResult> {
@@ -52,7 +52,7 @@ export async function generateDigest(input: DigestInput): Promise<DigestResult> 
     const res = await provider.complete({ system: SYSTEM, user, json: true });
     const parsed = JSON.parse(res.text);
     return {
-      headline: String(parsed.headline ?? "Your daily RecallOS digest"),
+      headline: String(parsed.headline ?? "Your daily Musemint digest"),
       bullets: Array.isArray(parsed.bullets) ? parsed.bullets.map(String) : fallback(input).bullets,
       cta: String(parsed.cta ?? "Open the inbox"),
       provider: provider.name,

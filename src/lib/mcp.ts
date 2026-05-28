@@ -1,7 +1,7 @@
 // Hand-rolled MCP-style JSON-RPC 2.0 over HTTP.
 // Spec: https://modelcontextprotocol.io
 // Supports: initialize, tools/list, tools/call.
-// Tools: recallos.capture, recallos.search, recallos.list_projects, recallos.generate_build_pack.
+// Tools: musemint.capture, musemint.search, musemint.list_projects, musemint.generate_build_pack.
 
 import { z } from "zod";
 import { timingSafeEqual } from "node:crypto";
@@ -12,7 +12,7 @@ import { generateBuildPack, packToMarkdown } from "./ai/generateBuildPack";
 import { parseJson } from "./utils";
 
 // Tools that mutate state or spend AI budget — gated behind MCP_SECRET.
-const WRITE_TOOLS = new Set(["recallos_capture", "recallos_generate_build_pack"]);
+const WRITE_TOOLS = new Set(["musemint_capture", "musemint_generate_build_pack"]);
 
 // Hard cap on JSON-RPC batch size to bound work per request.
 export const MCP_MAX_BATCH = 20;
@@ -57,9 +57,9 @@ export interface JsonRpcResponse {
 
 const TOOLS = [
   {
-    name: "recallos_capture",
+    name: "musemint_capture",
     description:
-      "Save content to RecallOS memory. Accepts URL, note, or prompt. Auto-classifies, scores, and stores. Returns the saved item.",
+      "Save content to Musemint memory. Accepts URL, note, or prompt. Auto-classifies, scores, and stores. Returns the saved item.",
     inputSchema: {
       type: "object",
       required: ["kind"],
@@ -80,7 +80,7 @@ const TOOLS = [
     },
   },
   {
-    name: "recallos_search",
+    name: "musemint_search",
     description:
       "Keyword search across saved memory (title, summary, tags, category, platform). Returns top items.",
     inputSchema: {
@@ -93,12 +93,12 @@ const TOOLS = [
     },
   },
   {
-    name: "recallos_list_projects",
+    name: "musemint_list_projects",
     description: "List buildable project ideas with portfolio value and tech stack.",
     inputSchema: { type: "object", properties: {} },
   },
   {
-    name: "recallos_generate_build_pack",
+    name: "musemint_generate_build_pack",
     description:
       "Generate a full implementation pack (problem statement, user stories, features, architecture, API plan, schema, tasks, README) for a project idea. Returns markdown.",
     inputSchema: {
@@ -110,10 +110,10 @@ const TOOLS = [
 ];
 
 const SERVER_INFO = {
-  name: "recallos",
+  name: "musemint",
   version: "0.1.0",
   description:
-    "RecallOS — turn saved web content into builder-ready project briefs. Stop saving. Start building.",
+    "Musemint — turn saved web content into builder-ready project briefs. Stop saving. Start building.",
 };
 
 function ok(id: JsonRpcRequest["id"], result: any): JsonRpcResponse {
@@ -154,7 +154,7 @@ async function handleToolCall(name: string, args: any, authed: boolean) {
       };
     }
   }
-  if (name === "recallos_capture") {
+  if (name === "musemint_capture") {
     const parsed = CaptureToolSchema.parse(args);
     const item = await createCapture(parsed);
     const tags = parseJson<string[]>(item.tagsJson, []);
@@ -169,7 +169,7 @@ async function handleToolCall(name: string, args: any, authed: boolean) {
       isError: false,
     };
   }
-  if (name === "recallos_search") {
+  if (name === "musemint_search") {
     const parsed = SearchToolSchema.parse(args);
     const items = await listItems({ search: parsed.query, limit: parsed.limit });
     const lines = items.map(
@@ -189,7 +189,7 @@ async function handleToolCall(name: string, args: any, authed: boolean) {
       isError: false,
     };
   }
-  if (name === "recallos_list_projects") {
+  if (name === "musemint_list_projects") {
     const projects = await listProjects();
     const lines = projects.map(
       (p) =>
@@ -208,7 +208,7 @@ async function handleToolCall(name: string, args: any, authed: boolean) {
       isError: false,
     };
   }
-  if (name === "recallos_generate_build_pack") {
+  if (name === "musemint_generate_build_pack") {
     const parsed = BuildPackToolSchema.parse(args);
     const project = await prisma.projectIdea.findUnique({ where: { id: parsed.projectId } });
     if (!project) return { content: [{ type: "text", text: "Project not found." }], isError: true };

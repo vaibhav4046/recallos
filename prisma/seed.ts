@@ -220,7 +220,7 @@ const INTEGRATIONS: { key: string; name: string; description: string; status: st
   { key: "notion", name: "Notion", description: "Export build packs as Notion pages", status: "available" },
   { key: "gdrive", name: "Google Drive", description: "Save screenshots and documents", status: "available" },
   { key: "gmail", name: "Gmail", description: "Capture newsletters and saved emails", status: "needs_setup" },
-  { key: "telegram", name: "Telegram Bot", description: "Forward to bot to capture into RecallOS", status: "coming_soon" },
+  { key: "telegram", name: "Telegram Bot", description: "Forward to bot to capture into Musemint", status: "coming_soon" },
   { key: "mcp", name: "MCP Server", description: "Expose your memory to any MCP-compatible client", status: "coming_soon" },
 ];
 
@@ -238,7 +238,7 @@ const PROJECTS = [
   {
     title: "RAG chatbot for personal memory",
     whyItMatters:
-      "Use the open-source RAG repo + vector DB primer to ship a chatbot over RecallOS captures.",
+      "Use the open-source RAG repo + vector DB primer to ship a chatbot over Musemint captures.",
     difficulty: "Intermediate",
     estBuildTime: "1 weekend",
     techStack: ["Next.js", "Prisma", "pgvector", "OpenAI"],
@@ -246,7 +246,7 @@ const PROJECTS = [
     portfolioValue: 88,
   },
   {
-    title: "MCP server for RecallOS",
+    title: "MCP server for Musemint",
     whyItMatters:
       "Expose captured items as MCP tools — directly inspired by the saved MCP agent video.",
     difficulty: "Advanced",
@@ -258,7 +258,7 @@ const PROJECTS = [
 ];
 
 async function main() {
-  console.log("→ seeding RecallOS demo data");
+  console.log("→ seeding Musemint demo data");
 
   const user = await prisma.user.upsert({
     where: { email: DEMO_EMAIL },

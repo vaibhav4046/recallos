@@ -25,7 +25,7 @@ function ShareInner() {
   const sp = useSearchParams();
   const router = useRouter();
   const [state, setState] = useState<"saving" | "done" | "error">("saving");
-  const [message, setMessage] = useState("Saving to RecallOS…");
+  const [message, setMessage] = useState("Saving to Musemint…");
   const started = useRef(false);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ function ShareInner() {
 
     if (!url && !rawContent && !title) {
       setState("error");
-      setMessage("Nothing was shared. Open RecallOS to capture manually.");
+      setMessage("Nothing was shared. Open Musemint to capture manually.");
       return;
     }
 
@@ -65,7 +65,7 @@ function ShareInner() {
           throw new Error(err.error ?? "failed");
         }
         setState("done");
-        setMessage("Saved! RecallOS is classifying and scoring it now.");
+        setMessage("Saved! Musemint is classifying and scoring it now.");
         setTimeout(() => router.replace("/inbox"), 1000);
       })
       .catch(() => {
@@ -110,7 +110,7 @@ function ShareInner() {
         ) : null}
       </div>
       <p className="mt-4 text-xs text-ink-faint">
-        Tip: add RecallOS to your home screen, then use Share → RecallOS from any app.
+        Tip: add Musemint to your home screen, then use Share → Musemint from any app.
       </p>
     </div>
   );

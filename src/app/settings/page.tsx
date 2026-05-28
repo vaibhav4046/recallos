@@ -68,7 +68,7 @@ export default function SettingsPage() {
           Privacy and AI <span className="text-accent">controls</span>.
         </h1>
         <p className="mt-2 max-w-xl text-sm text-ink-mute">
-          RecallOS is local-first. Pick your AI provider, export everything any time, and
+          Musemint is local-first. Pick your AI provider, export everything any time, and
           wipe memory on demand.
         </p>
       </header>
@@ -77,7 +77,7 @@ export default function SettingsPage() {
         <Card>
           <CardHeader
             title="AI providers"
-            description="RecallOS picks the first configured key. Mock provider runs fully offline."
+            description="Musemint picks the first configured key. Mock provider runs fully offline."
             right={
               <Badge tone={activeProvider === "mock" ? "muted" : "accent"}>
                 <Bot className="h-3 w-3" /> Active: {activeProvider}
@@ -163,7 +163,7 @@ export default function SettingsPage() {
               </span>
             </label>
             <p className="text-xs text-ink-mute">
-              Disabling local-first lets RecallOS optionally send captured text to your configured AI provider
+              Disabling local-first lets Musemint optionally send captured text to your configured AI provider
               for processing. We never ship media unless you explicitly turn that on.
             </p>
           </div>
