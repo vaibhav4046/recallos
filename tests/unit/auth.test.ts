@@ -50,7 +50,7 @@ describe("auth gate", () => {
   });
 
   it("exposes stable cookie constants", () => {
-    expect(AUTH_COOKIE).toBe("recallos_auth");
+    expect(AUTH_COOKIE).toBe("musemint_auth");
     expect(AUTH_MAX_AGE).toBeGreaterThan(0);
   });
 });

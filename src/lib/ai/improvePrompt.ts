@@ -1,6 +1,6 @@
 import { getProvider } from "./provider";
 
-const SYSTEM = `You are RecallOS, a prompt engineer. Rewrite the given prompt to be sharper, more reusable, and structured. Respond as JSON:
+const SYSTEM = `You are Musemint, a prompt engineer. Rewrite the given prompt to be sharper, more reusable, and structured. Respond as JSON:
 { "improved": string, "qualityScore": 0-100, "rationale": string }`;
 
 export interface ImproveInput {

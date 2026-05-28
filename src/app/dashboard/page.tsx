@@ -60,8 +60,8 @@ export default async function DashboardPage() {
           </h1>
           <p className="mt-2 max-w-xl text-sm text-ink-mute">
             {stats.processed === 0
-              ? "Capture your first link, note, or screenshot — RecallOS classifies, scores, and turns it into something you can ship."
-              : `RecallOS turned ${n(stats.processed, "processed capture")} into ${n(stats.readyToBuild, "project brief")}, ${n(stats.prompts, "reusable prompt")}, and ${n(stats.jobActions, "job-search action")}. Pick a card and ship.`}
+              ? "Capture your first link, note, or screenshot — Musemint classifies, scores, and turns it into something you can ship."
+              : `Musemint turned ${n(stats.processed, "processed capture")} into ${n(stats.readyToBuild, "project brief")}, ${n(stats.prompts, "reusable prompt")}, and ${n(stats.jobActions, "job-search action")}. Pick a card and ship.`}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">

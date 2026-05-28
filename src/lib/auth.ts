@@ -4,7 +4,7 @@
 // (global `crypto.subtle`) and no node-only imports, so both the middleware
 // (edge runtime) and the login route (node runtime) can share it.
 
-export const AUTH_COOKIE = "recallos_auth";
+export const AUTH_COOKIE = "musemint_auth";
 export const AUTH_MAX_AGE = 60 * 60 * 24 * 30; // 30 days
 
 export function authEnabled(): boolean {
@@ -18,7 +18,7 @@ export function authEnabled(): boolean {
  */
 export async function expectedToken(): Promise<string> {
   const secret = process.env.APP_PASSWORD ?? "";
-  const data = new TextEncoder().encode(`recallos:auth:${secret}`);
+  const data = new TextEncoder().encode(`musemint:auth:${secret}`);
   const digest = await crypto.subtle.digest("SHA-256", data);
   return Array.from(new Uint8Array(digest))
     .map((b) => b.toString(16).padStart(2, "0"))

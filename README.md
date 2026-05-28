@@ -1,8 +1,8 @@
-# RecallOS
+# Musemint
 
 > **Stop saving. Start building.**
 >
-> RecallOS is an AI-powered personal memory and execution system. It captures saved content from YouTube, LinkedIn, Instagram, browser links, screenshots, notes, GitHub repos, and pasted text — then turns them into actionable project briefs, prompt libraries, reminders, learning plans, job-search actions, and GitHub-ready implementation packs.
+> Musemint is an AI-powered personal memory and execution system. It captures saved content from YouTube, LinkedIn, Instagram, browser links, screenshots, notes, GitHub repos, and pasted text — then turns them into actionable project briefs, prompt libraries, reminders, learning plans, job-search actions, and GitHub-ready implementation packs.
 
 **Live**: https://recallos-vaibhav4046s-projects.vercel.app
 **Source**: https://github.com/vaibhav4046/recallos
@@ -76,7 +76,7 @@ npm run db:seed            # load realistic demo data
 npm run dev                # http://localhost:3000
 ```
 
-> You can run RecallOS **fully offline** with no AI keys — the mock provider produces deterministic outputs so every flow works end-to-end.
+> You can run Musemint **fully offline** with no AI keys — the mock provider produces deterministic outputs so every flow works end-to-end.
 
 ## Environment variables
 
@@ -199,7 +199,7 @@ Set `YOUTUBE_API_KEY` (separate from `GOOGLE_API_KEY` so it can be restricted to
 
 ## Platform limitations
 
-- **LinkedIn / Instagram saved posts** cannot be programmatically scraped without violating ToS. RecallOS supports them via:
+- **LinkedIn / Instagram saved posts** cannot be programmatically scraped without violating ToS. Musemint supports them via:
   - the native share sheet,
   - pasted URL,
   - screenshot upload + OCR,
@@ -214,7 +214,7 @@ Set `YOUTUBE_API_KEY` (separate from `GOOGLE_API_KEY` so it can be restricted to
 - Default storage is local SQLite. Set `DATABASE_URL=postgres://…` to migrate to Postgres / Supabase.
 - The capture flow does not log raw secrets and the AI provider layer never persists prompts outside the database.
 - Privacy controls in the UI: local-first toggle, full JSON export, complete memory wipe (`DELETE /api/export`).
-- No third-party scraping. Private-network captures (LinkedIn, Instagram) require the user to act — RecallOS only processes what arrives through the share sheet, paste, or screenshot.
+- No third-party scraping. Private-network captures (LinkedIn, Instagram) require the user to act — Musemint only processes what arrives through the share sheet, paste, or screenshot.
 
 ## Roadmap
 

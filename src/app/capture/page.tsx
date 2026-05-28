@@ -85,7 +85,7 @@ export default function CapturePage() {
       toast({
         kind: "success",
         title: "Captured",
-        body: "RecallOS processed it and dropped it into your inbox.",
+        body: "Musemint processed it and dropped it into your inbox.",
       });
       router.push("/inbox");
     } catch (err: any) {
@@ -118,7 +118,7 @@ export default function CapturePage() {
       <header>
         <div className="field-label">Universal capture</div>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight text-ink text-balance">
-          Drop in <span className="text-accent">anything</span> — RecallOS makes it useful.
+          Drop in <span className="text-accent">anything</span> — Musemint makes it useful.
         </h1>
         <p className="mt-2 text-sm text-ink-mute">
           Share sheet, browser extension, screenshot OCR, or paste — every input
@@ -182,7 +182,7 @@ export default function CapturePage() {
                 className="mt-1 block w-full rounded-lg border border-dashed border-line bg-bg-soft/40 px-3 py-6 text-sm text-ink-soft file:mr-3 file:rounded-md file:border-0 file:bg-accent file:px-3 file:py-1.5 file:text-[#0a1530]"
               />
               {screenshot ? (
-                <p className="mt-2 text-xs text-ink-mute">Image attached — RecallOS will OCR + summarize.</p>
+                <p className="mt-2 text-xs text-ink-mute">Image attached — Musemint will OCR + summarize.</p>
               ) : null}
             </div>
           ) : null}
@@ -272,7 +272,7 @@ export default function CapturePage() {
             <Button type="submit" variant="primary" disabled={submitting}>
               {submitting ? "Saving…" : (
                 <>
-                  Save to RecallOS <ArrowRight className="h-4 w-4" />
+                  Save to Musemint <ArrowRight className="h-4 w-4" />
                 </>
               )}
             </Button>

@@ -59,11 +59,11 @@ export function Sidebar() {
     <aside className="hidden md:flex w-64 shrink-0 flex-col gap-2 border-r border-line/70 bg-bg-panel/40 px-3 py-4 backdrop-blur-md">
       <div className="flex items-center gap-2 px-2 py-2">
         <div className="relative grid h-8 w-8 place-items-center rounded-lg border border-accent/40 bg-accent/10 text-accent">
-          <span className="font-mono text-sm font-bold">R</span>
+          <span className="font-mono text-sm font-bold">M</span>
           <span className="pointer-events-none absolute inset-0 rounded-lg shadow-glow" />
         </div>
         <div className="flex flex-col">
-          <span className="text-sm font-semibold tracking-tight">RecallOS</span>
+          <span className="text-sm font-semibold tracking-tight">Musemint</span>
           <span className="text-[10px] uppercase tracking-[0.18em] text-ink-mute">
             Stop saving · start building
           </span>

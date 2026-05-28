@@ -1,4 +1,4 @@
-// RecallOS database schema
+// Musemint database schema
 // SQLite for local MVP. Set DATABASE_URL=postgres://... to use Postgres/Supabase.
 
 generator client {

@@ -14,7 +14,7 @@ import {
 export const dynamic = "force-dynamic";
 
 const RESUME_BULLETS = [
-  "Shipped RecallOS — an AI memory + execution system turning saved content into builder-ready briefs.",
+  "Shipped Musemint — an AI memory + execution system turning saved content into builder-ready briefs.",
   "Built a pluggable AI provider layer (Gemini / OpenAI / Anthropic / Groq) with mock fallback for offline dev.",
   "Designed Next.js App Router + Prisma + Tailwind stack with Playwright smoke and Vitest unit coverage.",
 ];
@@ -22,7 +22,7 @@ const RESUME_BULLETS = [
 const RECRUITER_TEMPLATES = [
   {
     name: "Cold outreach",
-    body: `Hi [Name],\n\nI saw [Company] is hiring for [Role]. I just shipped RecallOS — an AI system that turns saved web content into ready-to-build project briefs. Three things I'd bring to your team:\n\n1. End-to-end TypeScript + AI provider abstraction\n2. Shipping bias: design → implement → tests → demo in days\n3. Clear writing — see [link]\n\nOpen to a 15-minute intro this week?`,
+    body: `Hi [Name],\n\nI saw [Company] is hiring for [Role]. I just shipped Musemint — an AI system that turns saved web content into ready-to-build project briefs. Three things I'd bring to your team:\n\n1. End-to-end TypeScript + AI provider abstraction\n2. Shipping bias: design → implement → tests → demo in days\n3. Clear writing — see [link]\n\nOpen to a 15-minute intro this week?`,
   },
   {
     name: "Application follow-up",
@@ -31,15 +31,15 @@ const RECRUITER_TEMPLATES = [
 ];
 
 const INTERVIEW_PREP = [
-  "Behavioral: STAR for 'time you ran an ambiguous project end-to-end' — use RecallOS build packs.",
-  "System design: walk through RecallOS architecture (provider abstraction, capture pipeline, memory graph).",
+  "Behavioral: STAR for 'time you ran an ambiguous project end-to-end' — use Musemint build packs.",
+  "System design: walk through Musemint architecture (provider abstraction, capture pipeline, memory graph).",
   "AI: explain mock provider fallback + cost-aware routing strategy.",
 ];
 
 const SKILL_GAPS = [
   { skill: "Vector databases", priority: "high", proof: "RAG chatbot project" },
   { skill: "Production AI evals", priority: "medium", proof: "Inbox classifier" },
-  { skill: "Mobile share extensions", priority: "medium", proof: "RecallOS mobile capture" },
+  { skill: "Mobile share extensions", priority: "medium", proof: "Musemint mobile capture" },
 ];
 
 export default async function JobSearchPage() {
@@ -142,7 +142,7 @@ export default async function JobSearchPage() {
             </li>
             <li className="flex gap-2 rounded-lg border border-line-soft bg-bg-soft/40 p-3 text-sm text-ink-soft">
               <Briefcase className="mt-0.5 h-4 w-4 text-accent" />
-              <span>Update LinkedIn headline with RecallOS shipping line.</span>
+              <span>Update LinkedIn headline with Musemint shipping line.</span>
             </li>
           </ul>
         </Card>
@@ -172,7 +172,7 @@ export default async function JobSearchPage() {
       </Card>
 
       <div className="text-xs text-ink-mute">
-        RecallOS never auto-applies. All outreach is human-approved.
+        Musemint never auto-applies. All outreach is human-approved.
       </div>
     </div>
   );

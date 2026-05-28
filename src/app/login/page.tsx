@@ -48,14 +48,14 @@ function LoginInner() {
       <div className="w-full max-w-sm">
         <div className="mb-6 flex items-center gap-2 text-accent">
           <Sparkles className="h-5 w-5" />
-          <span className="text-lg font-semibold tracking-tight text-ink">RecallOS</span>
+          <span className="text-lg font-semibold tracking-tight text-ink">Musemint</span>
         </div>
         <div className="panel p-6">
           <div className="flex items-center gap-2 text-sm font-semibold text-ink">
             <Lock className="h-4 w-4 text-accent" /> Locked workspace
           </div>
           <p className="mt-1 text-sm text-ink-mute">
-            This RecallOS instance is password-protected. Enter the access password to continue.
+            This Musemint instance is password-protected. Enter the access password to continue.
           </p>
           <form onSubmit={onSubmit} className="mt-4 space-y-3">
             <div>

@@ -1,7 +1,7 @@
 {
-  "name": "RecallOS — Stop saving. Start building.",
-  "short_name": "RecallOS",
-  "description": "Capture anything from your phone — YouTube, Instagram, LinkedIn, links, notes — and RecallOS turns it into projects, prompts, and shipping work.",
+  "name": "Musemint — Stop saving. Start building.",
+  "short_name": "Musemint",
+  "description": "Capture anything from your phone — YouTube, Instagram, LinkedIn, links, notes — and Musemint turns it into projects, prompts, and shipping work.",
   "id": "/",
   "start_url": "/dashboard?source=pwa",
   "scope": "/",

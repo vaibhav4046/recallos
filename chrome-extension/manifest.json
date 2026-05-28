@@ -1,13 +1,13 @@
 {
   "manifest_version": 3,
-  "name": "RecallOS Capture",
+  "name": "Musemint Capture",
   "version": "0.1.0",
-  "description": "One-click save the current tab to your RecallOS memory.",
+  "description": "One-click save the current tab to your Musemint memory.",
   "permissions": ["activeTab", "storage", "contextMenus", "scripting"],
   "host_permissions": ["https://*/*", "http://*/*"],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Capture to RecallOS",
+    "default_title": "Capture to Musemint",
     "default_icon": {
       "16": "icons/icon16.png",
       "48": "icons/icon48.png",
@@ -26,7 +26,7 @@
   "commands": {
     "capture-tab": {
       "suggested_key": { "default": "Alt+Shift+R" },
-      "description": "Capture current tab to RecallOS"
+      "description": "Capture current tab to Musemint"
     }
   }
 }

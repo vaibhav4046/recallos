@@ -20,7 +20,7 @@ export default function GlobalError({
       </div>
       <h1 className="text-2xl font-semibold tracking-tight text-ink">Something snapped.</h1>
       <p className="text-sm text-ink-mute">
-        RecallOS hit an unexpected error. Your memory is safe — try again or reload.
+        Musemint hit an unexpected error. Your memory is safe — try again or reload.
       </p>
       <pre className="max-w-md overflow-auto rounded-lg border border-line-soft bg-bg-soft/40 p-3 text-xs text-ink-mute">
         {error.message}

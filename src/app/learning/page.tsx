@@ -30,7 +30,7 @@ export default async function LearningPage() {
           Turn saved tutorials into <span className="text-accent">study sprints</span>.
         </h1>
         <p className="mt-2 max-w-xl text-sm text-ink-mute">
-          RecallOS ranks each learning save by usefulness × actionability. Pick a topic,
+          Musemint ranks each learning save by usefulness × actionability. Pick a topic,
           set the time, and build something tangible at the end.
         </p>
       </header>

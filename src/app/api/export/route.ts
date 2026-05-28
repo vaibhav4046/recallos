@@ -25,7 +25,7 @@ export async function GET() {
   return new NextResponse(JSON.stringify(payload, null, 2), {
     headers: {
       "Content-Type": "application/json",
-      "Content-Disposition": `attachment; filename="recallos-export.json"`,
+      "Content-Disposition": `attachment; filename="musemint-export.json"`,
     },
   });
 }
@@ -37,7 +37,7 @@ export async function DELETE(req: Request) {
   const body = await req.json().catch(() => null);
   const confirm =
     (body && typeof body.confirm === "string" ? body.confirm : null) ??
-    req.headers.get("x-recallos-confirm");
+    req.headers.get("x-musemint-confirm");
   if (confirm !== WIPE_PHRASE) {
     return NextResponse.json(
       {

@@ -1,6 +1,6 @@
-// RecallOS service worker — enables installability + a fast offline shell.
+// Musemint service worker — enables installability + a fast offline shell.
 // Deliberately conservative: never caches API responses or the /share handler.
-const CACHE = "recallos-v2";
+const CACHE = "musemint-v1";
 const SHELL = [
   "/dashboard",
   "/inbox",

@@ -107,7 +107,7 @@ export default function IntegrationsPage() {
         </h1>
         <p className="mt-2 max-w-xl text-sm text-ink-mute">
           Instagram and LinkedIn saved posts are captured via the share sheet, browser extension,
-          or screenshot OCR — RecallOS never scrapes private accounts.
+          or screenshot OCR — Musemint never scrapes private accounts.
         </p>
       </header>
 
@@ -149,7 +149,7 @@ export default function IntegrationsPage() {
       </div>
 
       <Card>
-        <CardHeader title="Privacy" description="What RecallOS will and won't do" />
+        <CardHeader title="Privacy" description="What Musemint will and won't do" />
         <ul className="space-y-2 text-sm text-ink-soft">
           <li>· Captures live in your local SQLite DB by default. Bring your own AI key to enable cloud processing.</li>
           <li>· LinkedIn and Instagram saved posts are <strong className="text-ink">never scraped</strong>. Use the official share sheet, the Chrome extension, or screenshot OCR.</li>

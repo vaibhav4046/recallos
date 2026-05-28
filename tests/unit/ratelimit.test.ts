@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { clientIp, rateLimit, dailyBudget, tooMany } from "@/lib/ratelimit";
 
 function reqWith(headers: Record<string, string>): Request {
-  return new Request("https://recallos.test/api", { headers });
+  return new Request("https://musemint.test/api", { headers });
 }
 
 describe("rate limiting", () => {
@@ -38,15 +38,15 @@ describe("rate limiting", () => {
   });
 
   it("dailyBudget honours a valid env override and defaults otherwise", () => {
-    delete process.env.RECALLOS_DAILY_AI_BUDGET;
+    delete process.env.MUSEMINT_DAILY_AI_BUDGET;
     expect(dailyBudget()).toBe(200);
-    process.env.RECALLOS_DAILY_AI_BUDGET = "50";
+    process.env.MUSEMINT_DAILY_AI_BUDGET = "50";
     expect(dailyBudget()).toBe(50);
-    process.env.RECALLOS_DAILY_AI_BUDGET = "-5";
+    process.env.MUSEMINT_DAILY_AI_BUDGET = "-5";
     expect(dailyBudget()).toBe(200);
-    process.env.RECALLOS_DAILY_AI_BUDGET = "abc";
+    process.env.MUSEMINT_DAILY_AI_BUDGET = "abc";
     expect(dailyBudget()).toBe(200);
-    delete process.env.RECALLOS_DAILY_AI_BUDGET;
+    delete process.env.MUSEMINT_DAILY_AI_BUDGET;
   });
 
   it("tooMany returns a 429 with a Retry-After header", () => {

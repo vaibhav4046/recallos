@@ -16,8 +16,8 @@ function setStatus(text, tone) {
 }
 
 async function getEndpoint() {
-  const { recallosEndpoint } = await chrome.storage.sync.get("recallosEndpoint");
-  return recallosEndpoint || DEFAULT_ENDPOINT;
+  const { musemintEndpoint } = await chrome.storage.sync.get("musemintEndpoint");
+  return musemintEndpoint || DEFAULT_ENDPOINT;
 }
 
 function detectKind(url) {
@@ -44,9 +44,9 @@ async function bootstrap() {
 changeEndpoint.addEventListener("click", async (e) => {
   e.preventDefault();
   const current = await getEndpoint();
-  const next = prompt("RecallOS endpoint URL:", current);
+  const next = prompt("Musemint endpoint URL:", current);
   if (next) {
-    await chrome.storage.sync.set({ recallosEndpoint: next });
+    await chrome.storage.sync.set({ musemintEndpoint: next });
     endpointLink.textContent = next.replace(/^https?:\/\//, "");
     endpointLink.href = next;
   }

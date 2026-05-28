@@ -28,7 +28,7 @@ export interface ProcessResult {
   provider: string;
 }
 
-const SYSTEM_PROMPT = `You are RecallOS, an AI that classifies and summarizes saved web/media/text content for a builder. Always respond as compact JSON with this shape:
+const SYSTEM_PROMPT = `You are Musemint, an AI that classifies and summarizes saved web/media/text content for a builder. Always respond as compact JSON with this shape:
 {
   "summary": string (1-2 crisp sentences, no fluff),
   "category": one of [AI Agents, Job Automation, UI Inspiration, Data Science, Prompt Engineering, Full-stack Projects, Learning Resources, Content Ideas, General],

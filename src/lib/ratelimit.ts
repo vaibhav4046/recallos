@@ -68,7 +68,11 @@ export function rateLimit(
 const DEFAULT_DAILY_BUDGET = 200;
 
 export function dailyBudget(): number {
-  const raw = Number(process.env.RECALLOS_DAILY_AI_BUDGET);
+  // MUSEMINT_DAILY_AI_BUDGET is the current name; RECALLOS_DAILY_AI_BUDGET is
+  // still read as a fallback so pre-rename deployments keep their override.
+  const raw = Number(
+    process.env.MUSEMINT_DAILY_AI_BUDGET ?? process.env.RECALLOS_DAILY_AI_BUDGET,
+  );
   return Number.isFinite(raw) && raw > 0 ? Math.floor(raw) : DEFAULT_DAILY_BUDGET;
 }
 
