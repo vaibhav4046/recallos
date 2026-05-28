@@ -71,7 +71,7 @@ export default function CapturePage() {
         process,
       };
       if (kind === "screenshot" && screenshot) {
-        payload.rawContent = `Screenshot OCR placeholder · base64 length ${screenshot.length}`;
+        payload.imageData = screenshot;
       }
       const res = await fetch("/api/capture", {
         method: "POST",
@@ -98,6 +98,15 @@ export default function CapturePage() {
   function onFile(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 6 * 1024 * 1024) {
+      toast({
+        kind: "error",
+        title: "Image too large",
+        body: "Please use an image under 6 MB.",
+      });
+      e.target.value = "";
+      return;
+    }
     if (!title) setTitle(file.name);
     const reader = new FileReader();
     reader.onload = () => setScreenshot(String(reader.result ?? ""));

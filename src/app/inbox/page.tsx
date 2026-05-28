@@ -1,11 +1,14 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ItemCard } from "@/components/ItemCard";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Badge } from "@/components/ui/Badge";
 import { useToast } from "@/components/ui/Toast";
 import { Filter, Inbox as InboxIcon, ListFilter, Search } from "lucide-react";
+
+export const dynamic = "force-dynamic";
 
 type Item = {
   id: string;
@@ -34,10 +37,14 @@ const STATUSES = [
 
 export default function InboxPage() {
   const toast = useToast();
+  const sp = useSearchParams();
+  const focusId = sp.get("focus");
   const [items, setItems] = useState<Item[] | null>(null);
   const [filter, setFilter] = useState<string>("inbox");
   const [category, setCategory] = useState<string | null>(null);
   const [q, setQ] = useState("");
+  const [focused, setFocused] = useState<string | null>(focusId);
+  const focusHandled = useRef<string | null>(null);
 
   async function load() {
     const res = await fetch(`/api/items?status=${filter}`);
@@ -50,6 +57,37 @@ export default function InboxPage() {
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filter]);
+
+  // A search result can point at an item in any status. Look up the focused
+  // item, switch to its tab so it's actually visible, then highlight + scroll.
+  useEffect(() => {
+    if (!focusId || focusHandled.current === focusId) return;
+    focusHandled.current = focusId;
+    setFocused(focusId);
+    (async () => {
+      try {
+        const res = await fetch(`/api/items/${focusId}`);
+        if (!res.ok) return;
+        const json = await res.json();
+        const status = json?.item?.status;
+        if (status && ["inbox", "kept", "archived"].includes(status)) {
+          setFilter(status);
+        }
+      } catch {
+        /* best-effort focus */
+      }
+    })();
+  }, [focusId]);
+
+  // Once the focused card is in the DOM, scroll to it and fade the highlight.
+  useEffect(() => {
+    if (!focused || items === null) return;
+    const el = document.querySelector<HTMLElement>(`[data-item-id="${focused}"]`);
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
+    const t = setTimeout(() => setFocused(null), 2600);
+    return () => clearTimeout(t);
+  }, [focused, items]);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -209,11 +247,20 @@ export default function InboxPage() {
       ) : (
         <div className="grid gap-3 md:grid-cols-2">
           {filtered.map((item) => (
-            <ItemCard
+            <div
               key={item.id}
-              item={{ ...item, createdAt: item.createdAt }}
-              onAction={(a) => onAction(item.id, a)}
-            />
+              data-item-id={item.id}
+              className={`rounded-2xl transition-all duration-500 ${
+                focused === item.id
+                  ? "ring-2 ring-accent/70 ring-offset-2 ring-offset-bg"
+                  : "ring-0"
+              }`}
+            >
+              <ItemCard
+                item={{ ...item, createdAt: item.createdAt }}
+                onAction={(a) => onAction(item.id, a)}
+              />
+            </div>
           ))}
         </div>
       )}

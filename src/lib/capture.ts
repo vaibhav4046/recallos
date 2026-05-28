@@ -4,6 +4,7 @@ import { detectPlatform } from "./utils";
 import { processItem } from "./ai/processItem";
 import { fetchYouTubeMetadata } from "./enrich/youtube";
 import { embedText, vectorLiteral } from "./embed";
+import { describeImage } from "./ai/vision";
 
 export const CaptureSchema = z.object({
   kind: z.enum([
@@ -21,6 +22,7 @@ export const CaptureSchema = z.object({
   url: z.string().url().optional().or(z.literal("")).optional(),
   title: z.string().min(1).max(280).optional(),
   rawContent: z.string().max(20_000).optional(),
+  imageData: z.string().max(9_000_000).optional(),
   intent: z
     .enum([
       "remember",
@@ -67,10 +69,22 @@ export async function createCapture(input: CaptureInput) {
     youtube = await fetchYouTubeMetadata(input.url);
   }
 
-  const enrichedTitle = youtube?.title || deriveTitle(input);
-  const enrichedRaw = youtube
+  let enrichedTitle = youtube?.title || deriveTitle(input);
+  let enrichedRaw = youtube
     ? [youtube.description, input.rawContent].filter(Boolean).join("\n\n")
     : input.rawContent ?? null;
+
+  // Screenshot understanding — real OCR + scene description via Gemini vision.
+  if (input.process && input.kind === "screenshot" && input.imageData) {
+    const vision = await describeImage(input.imageData);
+    if (vision) {
+      enrichedRaw =
+        [vision.text, input.rawContent].filter(Boolean).join("\n\n") || null;
+      if (!input.title?.trim() && vision.summary) {
+        enrichedTitle = vision.summary.slice(0, 120);
+      }
+    }
+  }
 
   let processed:
     | Awaited<ReturnType<typeof processItem>>
