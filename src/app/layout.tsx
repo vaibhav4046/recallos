@@ -10,7 +10,10 @@ import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 
 export const metadata: Metadata = {
   applicationName: "Musemint",
-  title: "Musemint · Stop saving. Start building.",
+  title: {
+    default: "Musemint · Stop saving. Start building.",
+    template: "%s · Musemint",
+  },
   description:
     "Musemint turns saved YouTube videos, LinkedIn posts, screenshots, and links into project briefs, prompts, and shipping work.",
   manifest: "/manifest.webmanifest",
@@ -52,7 +55,7 @@ export default function RootLayout({
             <div className="flex min-w-0 flex-1 flex-col">
               <TopBar />
               <div className="flex min-h-0 flex-1">
-                <main className="min-w-0 flex-1 px-5 py-6 md:px-8 md:py-8">
+                <main className="min-w-0 flex-1 overflow-x-hidden px-4 py-5 sm:px-5 sm:py-6 md:px-8 md:py-8">
                   <PageTransition>{children}</PageTransition>
                 </main>
                 <RightPanel />

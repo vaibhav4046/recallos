@@ -22,7 +22,7 @@ const RESUME_BULLETS = [
 const RECRUITER_TEMPLATES = [
   {
     name: "Cold outreach",
-    body: `Hi [Name],\n\nI saw [Company] is hiring for [Role]. I just shipped Musemint — an AI system that turns saved web content into ready-to-build project briefs. Three things I'd bring to your team:\n\n1. End-to-end TypeScript + AI provider abstraction\n2. Shipping bias: design → implement → tests → demo in days\n3. Clear writing — see [link]\n\nOpen to a 15-minute intro this week?`,
+    body: `Hi [Name],\n\nI saw [Company] is hiring for [Role]. I just shipped Musemint — an AI system that turns saved web content into ready-to-build project briefs. Three things I'd bring to your team:\n\n1. End-to-end TypeScript + AI provider abstraction\n2. Shipping bias: design → implement → tests → demo in days\n3. Clear writing — full case study at [your portfolio link]\n\nOpen to a 15-minute intro this week?`,
   },
   {
     name: "Application follow-up",
@@ -88,7 +88,21 @@ export default async function JobSearchPage() {
                     <MessageSquare className="h-3 w-3" /> template
                   </Badge>
                 </div>
-                <pre className="whitespace-pre-wrap text-xs text-ink-soft">{t.body}</pre>
+                <pre className="whitespace-pre-wrap text-xs text-ink-soft">
+                  {t.body.split(/(\[[^\]]+\])/g).map((chunk, idx) =>
+                    chunk.startsWith("[") && chunk.endsWith("]") ? (
+                      <span
+                        key={idx}
+                        className="rounded bg-accent/10 px-1 text-accent"
+                        title="Replace with your value"
+                      >
+                        {chunk}
+                      </span>
+                    ) : (
+                      <span key={idx}>{chunk}</span>
+                    ),
+                  )}
+                </pre>
               </div>
             ))}
           </div>

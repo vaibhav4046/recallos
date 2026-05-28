@@ -2,8 +2,9 @@ import Link from "next/link";
 import { Card, CardHeader } from "@/components/ui/Card";
 import { Badge, ScoreBar } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { QuizModal } from "@/components/QuizModal";
 import { listItems } from "@/lib/queries";
-import { GraduationCap, BookOpenCheck, Hammer, Sparkles } from "lucide-react";
+import { Hammer, Sparkles } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -86,9 +87,7 @@ export default async function LearningPage() {
                 <p className="mt-1 text-sm text-ink-soft">{item.nextAction ?? "Skim → take 5-bullet summary → build a tiny demo."}</p>
               </div>
               <div className="mt-4 flex flex-wrap items-center justify-end gap-2">
-                <Button size="sm">
-                  <BookOpenCheck className="h-3.5 w-3.5" /> Quiz me
-                </Button>
+                <QuizModal itemId={item.id} itemTitle={item.title} />
                 <Button size="sm" variant="primary">
                   <Hammer className="h-3.5 w-3.5" /> Build something from this
                 </Button>

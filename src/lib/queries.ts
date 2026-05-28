@@ -3,6 +3,21 @@ import { parseJson } from "./utils";
 
 export type ItemWithMeta = Awaited<ReturnType<typeof listItems>>[number];
 
+const EMPTY_TITLE_PATTERNS = [/^untitled capture$/i, /^untitled$/i];
+
+function looksEmpty(item: {
+  title: string;
+  url: string | null;
+  rawContent: string | null;
+  summary: string | null;
+}): boolean {
+  const titleEmpty = !item.title.trim() || EMPTY_TITLE_PATTERNS.some((re) => re.test(item.title.trim()));
+  const noUrl = !item.url?.trim();
+  const noRaw = !item.rawContent?.trim();
+  const noSummary = !item.summary?.trim();
+  return titleEmpty && noUrl && noRaw && noSummary;
+}
+
 export async function listItems(opts?: {
   status?: string;
   limit?: number;
@@ -26,7 +41,7 @@ export async function listItems(opts?: {
     orderBy: { createdAt: "desc" },
     take: opts?.limit ?? 200,
   });
-  return items.map((i) => ({
+  return items.filter((i) => !looksEmpty(i)).map((i) => ({
     ...i,
     tags: parseJson<string[]>(i.tagsJson, []),
     metadata: parseJson<Record<string, unknown>>(i.metadataJson, {}),

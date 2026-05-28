@@ -225,7 +225,7 @@ export function TopBar() {
           ) : null}
         </div>
         <div className="flex items-center gap-2">
-          <Link href="/reminders" className="btn-icon" aria-label="Reminders">
+          <Link href="/reminders" className="btn-icon hidden sm:inline-flex" aria-label="Reminders">
             <Bell className="h-4 w-4" />
           </Link>
           <Link href="/inbox" className="btn-ghost hidden md:inline-flex">
@@ -236,9 +236,10 @@ export function TopBar() {
             onClick={() => router.push("/capture")}
             variant="primary"
             className="gap-2"
+            aria-label="Capture"
           >
             <Plus className="h-4 w-4" />
-            <span>Capture</span>
+            <span className="hidden sm:inline">Capture</span>
           </Button>
         </div>
       </div>
