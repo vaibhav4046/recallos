@@ -206,13 +206,17 @@ const REMINDERS = [
 ];
 
 const INTEGRATIONS: { key: string; name: string; description: string; status: string }[] = [
-  { key: "youtube", name: "YouTube", description: "Import liked videos and watch later", status: "available" },
-  { key: "linkedin", name: "LinkedIn", description: "Capture saved posts via share sheet", status: "needs_setup" },
-  { key: "instagram", name: "Instagram", description: "Capture saved reels via share sheet or screenshot OCR", status: "needs_setup" },
+  { key: "youtube", name: "YouTube Data API", description: "Auto-enriches saved YouTube links with title, channel, duration, views, thumbnail", status: "connected" },
+  { key: "gemini", name: "Gemini 2.5 Flash", description: "Active AI provider — classification, scoring, summarization, prompt improvement", status: "connected" },
+  { key: "groq", name: "Groq Llama 3.1", description: "Fallback LLM (free tier) — fast inference if Gemini quota hits", status: "connected" },
+  { key: "mistral", name: "Mistral Small", description: "Tertiary LLM fallback (free tier)", status: "connected" },
+  { key: "neon", name: "Neon Postgres", description: "Serverless Postgres backing every capture, project, prompt, reminder", status: "connected" },
+  { key: "linkedin", name: "LinkedIn", description: "Capture saved posts via share sheet (never scraped)", status: "needs_setup" },
+  { key: "instagram", name: "Instagram", description: "Capture saved reels via share sheet or screenshot OCR (never scraped)", status: "needs_setup" },
   { key: "chrome", name: "Chrome Extension", description: "One-click save from any tab", status: "coming_soon" },
   { key: "mobile", name: "Mobile App", description: "iOS/Android share extension", status: "coming_soon" },
   { key: "ocr", name: "Screenshot OCR", description: "Extract text from saved screenshots", status: "available" },
-  { key: "github", name: "GitHub", description: "Sync starred repos and ship build packs as issues", status: "connected" },
+  { key: "github", name: "GitHub", description: "Sync starred repos and ship build packs as issues", status: "available" },
   { key: "notion", name: "Notion", description: "Export build packs as Notion pages", status: "available" },
   { key: "gdrive", name: "Google Drive", description: "Save screenshots and documents", status: "available" },
   { key: "gmail", name: "Gmail", description: "Capture newsletters and saved emails", status: "needs_setup" },

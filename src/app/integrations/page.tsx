@@ -17,6 +17,10 @@ import {
   Mail,
   Send,
   Server,
+  Sparkles,
+  Zap,
+  Bot,
+  Database,
 } from "lucide-react";
 import { ReactNode } from "react";
 
@@ -41,6 +45,10 @@ const ICONS: Record<string, ReactNode> = {
   gmail: <Mail className="h-5 w-5 text-[#ff9269]" />,
   telegram: <Send className="h-5 w-5 text-accent" />,
   mcp: <Server className="h-5 w-5 text-success" />,
+  gemini: <Sparkles className="h-5 w-5 text-accent" />,
+  groq: <Zap className="h-5 w-5 text-warn" />,
+  mistral: <Bot className="h-5 w-5 text-[#ff9269]" />,
+  neon: <Database className="h-5 w-5 text-success" />,
 };
 
 const STATUS_META: Record<string, { label: string; tone: "success" | "warn" | "danger" | "muted" | "accent" }> = {

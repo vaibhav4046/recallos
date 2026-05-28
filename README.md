@@ -4,7 +4,22 @@
 >
 > RecallOS is an AI-powered personal memory and execution system. It captures saved content from YouTube, LinkedIn, Instagram, browser links, screenshots, notes, GitHub repos, and pasted text — then turns them into actionable project briefs, prompt libraries, reminders, learning plans, job-search actions, and GitHub-ready implementation packs.
 
+**Live**: https://recallos-vaibhav4046s-projects.vercel.app
+**Source**: https://github.com/vaibhav4046/recallos
+
 A production-quality MVP built with Next.js App Router, Prisma, Tailwind, and a pluggable AI provider layer that runs **fully offline with a deterministic mock provider** until you bring your own key.
+
+### Production stack (free-tier everything)
+
+| Layer | Provider | Status |
+|---|---|---|
+| Hosting | Vercel (Hobby) | Live |
+| Database | Neon Postgres (free) | Connected |
+| Primary LLM | Gemini 2.5 Flash | Connected |
+| Fallback LLM | Groq Llama 3.1 8B Instant | Connected |
+| Tertiary LLM | Mistral Small | Connected |
+| YouTube enrichment | YouTube Data API v3 | Connected — pulls title, channel, duration, views, thumbnail |
+| Last-resort | Deterministic mock provider | Always available |
 
 ---
 
@@ -163,6 +178,12 @@ recallos/
 ### AI provider abstraction
 
 `getProvider()` reads env once, picks the first configured client, and falls back to the deterministic mock provider if SDK init fails. Every AI service file (`processItem`, `generateBuildPack`, `improvePrompt`, `generateDigest`) calls the provider with a JSON-shaped system prompt and **always** has a heuristic fallback so the UI is never blank.
+
+Provider priority: **Gemini → OpenAI → Anthropic → Groq → Mistral → Mock**
+
+### YouTube enrichment
+
+Set `YOUTUBE_API_KEY` (separate from `GOOGLE_API_KEY` so it can be restricted to YouTube Data API v3) and every saved YouTube URL is auto-enriched on capture: real title overrides the fallback, full description joins the rawContent before AI processing, and `metadataJson` is populated with `{ channel, publishedAt, durationSec, viewCount, thumbnail, videoId }`. See `src/lib/enrich/youtube.ts`.
 
 ### Data flow for a single capture
 
