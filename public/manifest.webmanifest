@@ -1,0 +1,33 @@
+{
+  "name": "RecallOS — Stop saving. Start building.",
+  "short_name": "RecallOS",
+  "description": "Capture anything from your phone — YouTube, Instagram, LinkedIn, links, notes — and RecallOS turns it into projects, prompts, and shipping work.",
+  "id": "/",
+  "start_url": "/dashboard?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#07090d",
+  "theme_color": "#07090d",
+  "categories": ["productivity", "utilities"],
+  "icons": [
+    { "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "share_target": {
+    "action": "/share",
+    "method": "GET",
+    "enctype": "application/x-www-form-urlencoded",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  "shortcuts": [
+    { "name": "Capture something", "short_name": "Capture", "url": "/capture?source=pwa", "description": "Save a link, note, or screenshot" },
+    { "name": "Open inbox", "short_name": "Inbox", "url": "/inbox", "description": "Triage your captures" }
+  ]
+}
