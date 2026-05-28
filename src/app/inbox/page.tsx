@@ -125,9 +125,18 @@ export default function InboxPage() {
         await patch(id, { status: "archived" });
         toast({ kind: "success", title: "Archived" });
       } else if (action === "project") {
+        toast({
+          kind: "info",
+          title: "Generating project brief",
+          body: "Musemint is scoring portfolio value and drafting the brief…",
+        });
         const res = await fetch(`/api/items/${id}/project`, { method: "POST" });
         if (!res.ok) throw new Error("Could not spawn project");
-        toast({ kind: "success", title: "Project created", body: "Open Ready to Build." });
+        toast({
+          kind: "success",
+          title: "Project brief ready",
+          body: "Opened in Ready to Build — generate the full build pack next.",
+        });
       } else if (action === "prompt") {
         const item = (items ?? []).find((i) => i.id === id);
         if (!item) return;

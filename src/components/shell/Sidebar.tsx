@@ -130,7 +130,7 @@ export function Sidebar() {
             Workspace
           </div>
           <div className="mt-1 text-xs text-ink-soft">
-            Single-user · Neon Postgres
+            Personal workspace
           </div>
         </div>
       </div>

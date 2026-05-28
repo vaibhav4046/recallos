@@ -10,11 +10,15 @@ export async function GET(req: Request) {
   const blocked = await enforce(req, { name: "digest", limit: 30, windowMs: 60_000, ai: true });
   if (blocked) return blocked;
   const user = await getDemoUser();
-  const [items, projects, reminders] = await Promise.all([
+  const [itemsRaw, projects, reminders] = await Promise.all([
     prisma.capturedItem.findMany({
-      where: { userId: user.id },
+      where: {
+        userId: user.id,
+        // Hide placeholder / empty captures from the digest.
+        NOT: { title: { in: ["Untitled capture", "Untitled"] } },
+      },
       orderBy: { createdAt: "desc" },
-      take: 8,
+      take: 12,
     }),
     prisma.projectIdea.findMany({
       where: { userId: user.id },
@@ -27,6 +31,15 @@ export async function GET(req: Request) {
       take: 4,
     }),
   ]);
+  const items = itemsRaw
+    .filter((i) => {
+      const hasContent =
+        (i.summary && i.summary.trim()) ||
+        (i.rawContent && i.rawContent.trim()) ||
+        (i.url && i.url.trim());
+      return hasContent;
+    })
+    .slice(0, 8);
   const digest = await generateDigest({
     items: items.map((i) => ({
       title: i.title,

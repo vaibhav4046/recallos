@@ -40,6 +40,36 @@ const INTENTS = [
   { key: "summarize", label: "Summarize only" },
 ];
 
+const URL_KINDS = new Set(["url", "youtube", "linkedin", "instagram", "github", "article"]);
+const TEXT_KINDS = new Set(["note", "prompt", "text"]);
+
+function validateCapture(args: {
+  kind: string;
+  url: string;
+  title: string;
+  rawContent: string;
+  screenshot: string | null;
+}): string | null {
+  const url = args.url.trim();
+  const raw = args.rawContent.trim();
+  const title = args.title.trim();
+  if (URL_KINDS.has(args.kind)) {
+    if (!url && !raw && !title) return "Add a URL, a title, or notes before saving.";
+    if (url) {
+      try {
+        new URL(url);
+      } catch {
+        return "That doesn't look like a valid URL.";
+      }
+    }
+  } else if (TEXT_KINDS.has(args.kind)) {
+    if (!raw && !title) return `Write a ${args.kind === "prompt" ? "prompt" : "note"} body or title before saving.`;
+  } else if (args.kind === "screenshot") {
+    if (!args.screenshot && !raw && !title) return "Attach an image or add notes before saving.";
+  }
+  return null;
+}
+
 export default function CapturePage() {
   const sp = useSearchParams();
   const router = useRouter();
@@ -52,14 +82,23 @@ export default function CapturePage() {
   const [submitting, setSubmitting] = useState(false);
   const [process, setProcess] = useState(true);
   const [screenshot, setScreenshot] = useState<string | null>(null);
+  const [touched, setTouched] = useState(false);
 
   useEffect(() => {
     const k = sp.get("kind");
     if (k) setKind(k);
   }, [sp]);
 
+  const validationError = validateCapture({ kind, url, title, rawContent, screenshot });
+  const canSubmit = !validationError && !submitting;
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setTouched(true);
+    if (validationError) {
+      toast({ kind: "error", title: "Add something to save", body: validationError });
+      return;
+    }
     setSubmitting(true);
     try {
       const payload: Record<string, unknown> = {
@@ -265,11 +304,26 @@ export default function CapturePage() {
             </label>
           </div>
 
+          {touched && validationError ? (
+            <div
+              role="alert"
+              className="rounded-lg border border-danger/40 bg-danger/[0.08] px-3 py-2 text-xs text-danger"
+            >
+              {validationError}
+            </div>
+          ) : null}
+
           <div className="flex items-center justify-end gap-2">
             <Button type="button" variant="ghost" onClick={() => router.back()}>
               Cancel
             </Button>
-            <Button type="submit" variant="primary" disabled={submitting}>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={!canSubmit}
+              title={validationError ?? "Save to Musemint"}
+              aria-disabled={!canSubmit}
+            >
               {submitting ? "Saving…" : (
                 <>
                   Save to Musemint <ArrowRight className="h-4 w-4" />
