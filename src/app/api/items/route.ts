@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { listItems } from "@/lib/queries";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const status = url.searchParams.get("status") ?? undefined;

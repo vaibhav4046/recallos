@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { generateDigest } from "@/lib/ai/generateDigest";
 import { prisma, getDemoUser } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   const user = await getDemoUser();
   const [items, projects, reminders] = await Promise.all([

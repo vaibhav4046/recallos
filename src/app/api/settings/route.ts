@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { activeProviderName } from "@/lib/ai/provider";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   const keys = [
     { provider: "gemini", configured: !!process.env.GOOGLE_API_KEY },

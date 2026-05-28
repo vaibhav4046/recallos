@@ -3,6 +3,9 @@ import { z } from "zod";
 import { prisma, getDemoUser } from "@/lib/prisma";
 import { listReminders } from "@/lib/queries";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   const reminders = await listReminders();
   return NextResponse.json({ reminders });

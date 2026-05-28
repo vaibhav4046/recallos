@@ -4,6 +4,9 @@ import { prisma, getDemoUser } from "@/lib/prisma";
 import { listPrompts } from "@/lib/queries";
 import { improvePrompt } from "@/lib/ai/improvePrompt";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export async function GET() {
   const prompts = await listPrompts();
   return NextResponse.json({ prompts });

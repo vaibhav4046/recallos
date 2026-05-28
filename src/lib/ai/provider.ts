@@ -45,7 +45,7 @@ async function geminiProvider(): Promise<AiProvider> {
   const { GoogleGenerativeAI } = await import("@google/generative-ai");
   const client = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY as string);
   const model = client.getGenerativeModel({
-    model: "gemini-1.5-flash",
+    model: "gemini-2.5-flash",
     generationConfig: { responseMimeType: "application/json" },
   });
   return {
