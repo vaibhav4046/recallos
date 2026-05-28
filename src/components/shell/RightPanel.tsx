@@ -14,6 +14,7 @@ interface StatsLite {
   saved: number;
   processed: number;
   readyToBuild: number;
+  forgottenGems: number;
   memoryHealth: number;
   classificationConfidence: number;
 }
@@ -72,20 +73,20 @@ export function RightPanel() {
         </div>
         <div className="flex items-baseline gap-2">
           <span className="text-3xl font-semibold tracking-tight text-ink">
-            {stats?.memoryHealth ?? 81}
+            {stats?.memoryHealth ?? "—"}
           </span>
           <span className="text-sm text-ink-mute">/ 100</span>
         </div>
         <div className="mt-2 h-1.5 w-full rounded-full bg-bg-soft">
           <div
-            className="h-full rounded-full bg-gradient-to-r from-accent to-accent-glow"
-            style={{ width: `${stats?.memoryHealth ?? 81}%` }}
+            className="h-full rounded-full bg-gradient-to-r from-accent to-accent-glow transition-all duration-500"
+            style={{ width: `${stats?.memoryHealth ?? 0}%` }}
           />
         </div>
         <div className="mt-3 text-xs text-ink-mute">
           AI classification confidence{" "}
           <span className="text-ink-soft">
-            {stats?.classificationConfidence ?? 92}%
+            {stats ? `${stats.classificationConfidence}%` : "—"}
           </span>
         </div>
       </div>
@@ -96,7 +97,11 @@ export function RightPanel() {
           <span>Forgotten gems</span>
         </div>
         <p className="text-sm text-ink-soft">
-          9 captures haven't been touched in 5+ days. Most likely candidates for a weekend build.
+          {stats === null
+            ? "Checking for stale captures…"
+            : stats.forgottenGems === 0
+              ? "Nothing stale — your memory is well-triaged. Capture something to keep momentum."
+              : `${stats.forgottenGems} capture${stats.forgottenGems === 1 ? "" : "s"} haven't been touched in 5+ days. Most likely candidates for a weekend build.`}
         </p>
         <Link
           href="/inbox?status=inbox"
