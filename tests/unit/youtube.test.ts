@@ -17,16 +17,24 @@ describe("YouTube enrichment", () => {
   });
 
   it("extracts video ID from /shorts/", () => {
-    expect(extractVideoId("https://www.youtube.com/shorts/abc123")).toBe("abc123");
+    expect(extractVideoId("https://www.youtube.com/shorts/aBc123XyZ_0")).toBe("aBc123XyZ_0");
   });
 
   it("extracts video ID from /embed/", () => {
-    expect(extractVideoId("https://www.youtube.com/embed/xyz789")).toBe("xyz789");
+    expect(extractVideoId("https://www.youtube.com/embed/XyZ789AbC-1")).toBe("XyZ789AbC-1");
   });
 
   it("returns null for non-YouTube URLs", () => {
     expect(extractVideoId("https://example.com/video")).toBeNull();
     expect(extractVideoId("not-a-url")).toBeNull();
+  });
+
+  it("rejects malformed IDs that are not exactly 11 url-safe chars (SSRF guard)", () => {
+    // Too short, too long, or containing injection chars must all be refused
+    // so they can never be spliced into the Data API request.
+    expect(extractVideoId("https://www.youtube.com/shorts/abc123")).toBeNull();
+    expect(extractVideoId("https://youtu.be/tooLongVideoId12345")).toBeNull();
+    expect(extractVideoId("https://www.youtube.com/watch?v=bad/../id")).toBeNull();
   });
 
   it("fetchYouTubeMetadata returns null when YOUTUBE_API_KEY missing", async () => {
