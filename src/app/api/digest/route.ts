@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { generateDigest } from "@/lib/ai/generateDigest";
 import { prisma, getDemoUser } from "@/lib/prisma";
+import { enforce } from "@/lib/ratelimit";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export async function GET() {
+export async function GET(req: Request) {
+  const blocked = await enforce(req, { name: "digest", limit: 30, windowMs: 60_000, ai: true });
+  if (blocked) return blocked;
   const user = await getDemoUser();
   const [items, projects, reminders] = await Promise.all([
     prisma.capturedItem.findMany({

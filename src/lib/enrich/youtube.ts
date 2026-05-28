@@ -12,21 +12,31 @@ export interface YouTubeMetadata {
   thumbnail: string;
 }
 
+// A YouTube video id is exactly 11 url-safe base64 chars. Validating against
+// this prevents an attacker-controlled URL from injecting extra query params
+// or path segments into the Data API request (SSRF / parameter injection).
+const VIDEO_ID = /^[A-Za-z0-9_-]{11}$/;
+
 export function extractVideoId(url: string): string | null {
+  let raw: string | null = null;
   try {
     const u = new URL(url);
-    if (u.hostname === "youtu.be") return u.pathname.slice(1) || null;
-    if (u.hostname.endsWith("youtube.com")) {
+    if (u.hostname === "youtu.be") {
+      raw = u.pathname.slice(1) || null;
+    } else if (u.hostname === "youtube.com" || u.hostname.endsWith(".youtube.com")) {
       const v = u.searchParams.get("v");
-      if (v) return v;
-      // /shorts/ID or /embed/ID
-      const parts = u.pathname.split("/").filter(Boolean);
-      if (parts[0] === "shorts" || parts[0] === "embed") return parts[1] ?? null;
+      if (v) {
+        raw = v;
+      } else {
+        // /shorts/ID or /embed/ID
+        const parts = u.pathname.split("/").filter(Boolean);
+        if (parts[0] === "shorts" || parts[0] === "embed") raw = parts[1] ?? null;
+      }
     }
   } catch {
     return null;
   }
-  return null;
+  return raw && VIDEO_ID.test(raw) ? raw : null;
 }
 
 function parseISODuration(iso: string): number {
@@ -48,7 +58,7 @@ export async function fetchYouTubeMetadata(
   if (!id) return null;
   try {
     const res = await fetch(
-      `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${id}&key=${key}`,
+      `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails,statistics&id=${encodeURIComponent(id)}&key=${encodeURIComponent(key)}`,
       { cache: "no-store" },
     );
     if (!res.ok) return null;

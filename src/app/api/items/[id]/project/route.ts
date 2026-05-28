@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma, getDemoUser } from "@/lib/prisma";
 import { parseJson } from "@/lib/utils";
+import { handle } from "@/lib/api";
 
-export async function POST(_req: Request, { params }: { params: { id: string } }) {
-  const item = await prisma.capturedItem.findUnique({ where: { id: params.id } });
-  if (!item) return NextResponse.json({ error: "not_found" }, { status: 404 });
+export const POST = handle(async (_req, { params }) => {
   const user = await getDemoUser();
+  const item = await prisma.capturedItem.findFirst({
+    where: { id: params.id, userId: user.id },
+  });
+  if (!item) return NextResponse.json({ error: "not_found" }, { status: 404 });
   const scores = parseJson<{ portfolioValue: number; actionability: number; confidence: number }>(
     item.scoresJson,
     { portfolioValue: 60, actionability: 60, confidence: 70 },
@@ -39,4 +42,4 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
   });
 
   return NextResponse.json({ project });
-}
+});

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
+import { prisma, getDemoUser } from "@/lib/prisma";
 import { getItem } from "@/lib/queries";
 
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
@@ -24,6 +24,12 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   if (!parsed.success) {
     return NextResponse.json({ error: "invalid_input" }, { status: 400 });
   }
+  const user = await getDemoUser();
+  const owned = await prisma.capturedItem.findFirst({
+    where: { id: params.id, userId: user.id },
+    select: { id: true },
+  });
+  if (!owned) return NextResponse.json({ error: "not_found" }, { status: 404 });
   const item = await prisma.capturedItem.update({
     where: { id: params.id },
     data: parsed.data,
@@ -32,6 +38,10 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 }
 
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-  await prisma.capturedItem.delete({ where: { id: params.id } });
+  const user = await getDemoUser();
+  const res = await prisma.capturedItem.deleteMany({
+    where: { id: params.id, userId: user.id },
+  });
+  if (res.count === 0) return NextResponse.json({ error: "not_found" }, { status: 404 });
   return NextResponse.json({ ok: true });
 }
