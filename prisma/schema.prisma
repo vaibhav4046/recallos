@@ -1,0 +1,177 @@
+// RecallOS database schema
+// SQLite for local MVP. Set DATABASE_URL=postgres://... to use Postgres/Supabase.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items        CapturedItem[]
+  projects     ProjectIdea[]
+  prompts      Prompt[]
+  reminders    Reminder[]
+  integrations Integration[]
+  collections  Collection[]
+  buildPacks   BuildPack[]
+  logs         AiProcessingLog[]
+}
+
+model CapturedItem {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  kind            String   // url | note | prompt | screenshot | youtube | linkedin | instagram | github | article | text
+  sourcePlatform  String   // youtube, linkedin, instagram, github, web, note, screenshot, chrome, mobile
+  url             String?
+  rawContent      String?
+  title           String
+  summary         String?
+  category        String?
+  tagsJson        String   @default("[]")    // string[]
+  metadataJson    String   @default("{}")    // arbitrary metadata
+  scoresJson      String   @default("{}")    // usefulness, actionability, portfolioValue, confidence
+  nextAction      String?
+  intent          String?  // remember | project | prompt | learn | jobsearch | reminder | summarize | auto
+  status          String   @default("inbox") // inbox | kept | archived | trashed | merged
+  isProcessed     Boolean  @default(false)
+  processedAt     DateTime?
+  reminderId      String?
+  reminder        Reminder? @relation(fields: [reminderId], references: [id])
+  projectId       String?
+  project         ProjectIdea? @relation("ItemProject", fields: [projectId], references: [id])
+  collectionId    String?
+  collection      Collection? @relation(fields: [collectionId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  tags            Tag[]   @relation("ItemTags")
+  logs            AiProcessingLog[]
+
+  @@index([userId, status])
+  @@index([userId, createdAt])
+  @@index([category])
+}
+
+model Tag {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String?
+  createdAt DateTime @default(now())
+  items     CapturedItem[] @relation("ItemTags")
+}
+
+model Collection {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  description String?
+  color     String?
+  createdAt DateTime @default(now())
+  items     CapturedItem[]
+}
+
+model ProjectIdea {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title         String
+  whyItMatters  String
+  sourceItemsJson String @default("[]") // array of CapturedItem ids
+  difficulty    String   // beginner | intermediate | advanced
+  estBuildTime  String
+  techStackJson String   @default("[]")
+  githubScore   Int      // 0-100
+  portfolioValue Int     // 0-100
+  status        String   @default("idea") // idea | building | shipped | archived
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  items         CapturedItem[] @relation("ItemProject")
+  buildPacks    BuildPack[]
+}
+
+model BuildPack {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  projectId   String
+  project     ProjectIdea @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  contentJson String   // full structured pack
+  markdown    String   // pre-rendered MD export
+  readme      String   // README.md draft
+  checklist   String   // GitHub issue-style checklist
+  createdAt   DateTime @default(now())
+}
+
+model Prompt {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  body         String
+  improvedBody String?
+  category     String   @default("general")
+  qualityScore Int      @default(60)
+  versionsJson String   @default("[]")
+  tagsJson     String   @default("[]")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String?
+  kind      String   // forgotten | build | learn | prompt | job | finish | digest | review
+  dueAt     DateTime
+  status    String   @default("due") // due | done | snoozed
+  snoozedTo DateTime?
+  itemId    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items     CapturedItem[]
+}
+
+model Integration {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  key         String   // youtube, linkedin, instagram, chrome, mobile, ocr, github, notion, gdrive, gmail, telegram, mcp
+  name        String
+  description String
+  status      String   // connected | available | needs_setup | coming_soon
+  metadataJson String  @default("{}")
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, key])
+}
+
+model AiProcessingLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  itemId    String?
+  item      CapturedItem? @relation(fields: [itemId], references: [id], onDelete: SetNull)
+  provider  String
+  task      String   // process | buildpack | improve | digest
+  ok        Boolean
+  ms        Int
+  notes     String?
+  createdAt DateTime @default(now())
+}
