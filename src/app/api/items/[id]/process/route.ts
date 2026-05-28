@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, getDemoUser } from "@/lib/prisma";
 import { processItem } from "@/lib/ai/processItem";
+import { enforce } from "@/lib/ratelimit";
+import { handle } from "@/lib/api";
 
-export async function POST(_req: Request, { params }: { params: { id: string } }) {
-  const existing = await prisma.capturedItem.findUnique({ where: { id: params.id } });
+export const POST = handle(async (req, { params }) => {
+  const blocked = await enforce(req, { name: "process", limit: 40, windowMs: 60_000, ai: true });
+  if (blocked) return blocked;
+  const user = await getDemoUser();
+  const existing = await prisma.capturedItem.findFirst({
+    where: { id: params.id, userId: user.id },
+  });
   if (!existing) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
   const t = Date.now();
@@ -39,4 +46,4 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
     },
   });
   return NextResponse.json({ item, result });
-}
+});

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
-import { prisma } from "@/lib/prisma";
+import { prisma, getDemoUser } from "@/lib/prisma";
 
 const Schema = z.object({
   status: z.enum(["due", "done", "snoozed"]).optional(),
@@ -12,6 +12,12 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   const body = await req.json().catch(() => null);
   const parsed = Schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "invalid_input" }, { status: 400 });
+  const user = await getDemoUser();
+  const owned = await prisma.reminder.findFirst({
+    where: { id: params.id, userId: user.id },
+    select: { id: true },
+  });
+  if (!owned) return NextResponse.json({ error: "not_found" }, { status: 404 });
   const reminder = await prisma.reminder.update({
     where: { id: params.id },
     data: {
@@ -23,6 +29,10 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
 }
 
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-  await prisma.reminder.delete({ where: { id: params.id } });
+  const user = await getDemoUser();
+  const res = await prisma.reminder.deleteMany({
+    where: { id: params.id, userId: user.id },
+  });
+  if (res.count === 0) return NextResponse.json({ error: "not_found" }, { status: 404 });
   return NextResponse.json({ ok: true });
 }

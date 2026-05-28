@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { listItems } from "@/lib/queries";
 import { embedQuery, vectorLiteral } from "@/lib/embed";
 import { prisma, getDemoUser } from "@/lib/prisma";
+import { enforce } from "@/lib/ratelimit";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -16,8 +17,11 @@ type SearchHit = {
 };
 
 export async function GET(req: Request) {
+  const blocked = await enforce(req, { name: "search", limit: 60, windowMs: 60_000 });
+  if (blocked) return blocked;
   const url = new URL(req.url);
-  const q = (url.searchParams.get("q") ?? "").trim();
+  // Cap query length to bound DB / embedding work and reject abuse.
+  const q = (url.searchParams.get("q") ?? "").trim().slice(0, 500);
   const semantic = url.searchParams.get("semantic") === "1";
   if (!q) return NextResponse.json({ items: [], mode: "empty" });
 

@@ -45,7 +45,9 @@ export async function listItems(opts?: {
 }
 
 export async function getItem(id: string) {
-  const item = await prisma.capturedItem.findUnique({ where: { id } });
+  const user = await getDemoUser();
+  // Scope by owner so an item id from another user can never be read (IDOR).
+  const item = await prisma.capturedItem.findFirst({ where: { id, userId: user.id } });
   if (!item) return null;
   return {
     ...item,
@@ -109,9 +111,10 @@ export async function listIntegrations() {
 
 export async function getStats() {
   const user = await getDemoUser();
-  const [items, processed, projects, prompts, reminders, integrations] = await Promise.all([
+  const [items, processed, inbox, projects, prompts, reminders, integrations] = await Promise.all([
     prisma.capturedItem.count({ where: { userId: user.id } }),
     prisma.capturedItem.count({ where: { userId: user.id, isProcessed: true } }),
+    prisma.capturedItem.count({ where: { userId: user.id, status: "inbox" } }),
     prisma.projectIdea.count({ where: { userId: user.id } }),
     prisma.prompt.count({ where: { userId: user.id } }),
     prisma.reminder.count({ where: { userId: user.id, status: "due" } }),
@@ -138,23 +141,33 @@ export async function getStats() {
       return acc + (s.confidence ?? 0);
     }, 0) / Math.max(portfolioItems.length, 1);
 
-  const memoryHealth = Math.min(
-    100,
-    Math.round(60 + (processed / Math.max(items, 1)) * 40 - Math.min(forgottenGems * 2, 20)),
-  );
+  const jobActions = await prisma.capturedItem.count({
+    where: { userId: user.id, intent: "jobsearch" },
+  });
 
-  // Headline numbers default to spec values when DB is fresh-but-seeded so the
-  // dashboard always reads polished. Real counts still drive secondary cards.
+  const memoryHealth =
+    items === 0
+      ? 0
+      : Math.min(
+          100,
+          Math.round(
+            60 + (processed / Math.max(items, 1)) * 40 - Math.min(forgottenGems * 2, 20),
+          ),
+        );
+
+  // Honest, real-time counts straight from the database — every number reflects
+  // exactly what the user has captured and processed. No floors, no fakes.
   return {
-    saved: Math.max(items, 147),
-    processed: Math.max(processed, 38),
-    readyToBuild: Math.max(projects, 12),
-    forgottenGems: Math.max(forgottenGems, 9),
-    prompts: Math.max(prompts, 23),
-    portfolioWorthy: Math.max(portfolioCount, 6),
-    jobActions: 4,
-    memoryHealth: Math.max(memoryHealth, 81),
-    classificationConfidence: Math.max(Math.round(confidenceAvg), 92),
+    saved: items,
+    processed,
+    inbox,
+    readyToBuild: projects,
+    forgottenGems,
+    prompts,
+    portfolioWorthy: portfolioCount,
+    jobActions,
+    memoryHealth,
+    classificationConfidence: processed === 0 ? 0 : Math.round(confidenceAvg),
     remindersDue: reminders,
     integrationsConnected: integrations,
     realCounts: { items, processed, projects, prompts },

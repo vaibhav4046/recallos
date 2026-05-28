@@ -6,15 +6,23 @@ import {
   packToChecklist,
   packToMarkdown,
 } from "@/lib/ai/generateBuildPack";
+import { enforce } from "@/lib/ratelimit";
+import { handle } from "@/lib/api";
 
-export async function POST(_req: Request, { params }: { params: { id: string } }) {
-  const project = await prisma.projectIdea.findUnique({ where: { id: params.id } });
-  if (!project) return NextResponse.json({ error: "not_found" }, { status: 404 });
+export const POST = handle(async (req, { params }) => {
+  const blocked = await enforce(req, { name: "buildpack", limit: 20, windowMs: 60_000, ai: true });
+  if (blocked) return blocked;
   const user = await getDemoUser();
+  const project = await prisma.projectIdea.findFirst({
+    where: { id: params.id, userId: user.id },
+  });
+  if (!project) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
   const sourceIds = parseJson<string[]>(project.sourceItemsJson, []);
   const sourceItems = sourceIds.length
-    ? await prisma.capturedItem.findMany({ where: { id: { in: sourceIds } } })
+    ? await prisma.capturedItem.findMany({
+        where: { id: { in: sourceIds }, userId: user.id },
+      })
     : [];
 
   const techStack = parseJson<string[]>(project.techStackJson, []);
@@ -63,4 +71,4 @@ export async function POST(_req: Request, { params }: { params: { id: string } }
   });
 
   return NextResponse.json({ buildPack });
-}
+});

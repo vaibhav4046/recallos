@@ -4,11 +4,42 @@
 // Tools: recallos.capture, recallos.search, recallos.list_projects, recallos.generate_build_pack.
 
 import { z } from "zod";
+import { timingSafeEqual } from "node:crypto";
 import { createCapture, CaptureSchema } from "./capture";
 import { listItems, listProjects } from "./queries";
 import { prisma } from "./prisma";
 import { generateBuildPack, packToMarkdown } from "./ai/generateBuildPack";
 import { parseJson } from "./utils";
+
+// Tools that mutate state or spend AI budget — gated behind MCP_SECRET.
+const WRITE_TOOLS = new Set(["recallos_capture", "recallos_generate_build_pack"]);
+
+// Hard cap on JSON-RPC batch size to bound work per request.
+export const MCP_MAX_BATCH = 20;
+
+/** True when a write-capable MCP secret is configured. */
+export function mcpWriteEnabled(): boolean {
+  return !!process.env.MCP_SECRET;
+}
+
+/**
+ * Constant-time check of an `Authorization: Bearer <token>` header against
+ * MCP_SECRET. Returns false when no secret is configured (writes disabled).
+ */
+export function isAuthorized(authHeader: string | null): boolean {
+  const secret = process.env.MCP_SECRET;
+  if (!secret || !authHeader) return false;
+  const m = authHeader.match(/^Bearer\s+(.+)$/i);
+  if (!m) return false;
+  const a = Buffer.from(m[1].trim());
+  const b = Buffer.from(secret);
+  if (a.length !== b.length) return false;
+  try {
+    return timingSafeEqual(a, b);
+  } catch {
+    return false;
+  }
+}
 
 export interface JsonRpcRequest {
   jsonrpc: "2.0";
@@ -94,14 +125,35 @@ function err(id: JsonRpcRequest["id"], code: number, message: string): JsonRpcRe
 
 const CaptureToolSchema = CaptureSchema;
 const SearchToolSchema = z.object({
-  query: z.string().min(1),
+  query: z.string().min(1).max(500),
   limit: z.number().int().min(1).max(50).default(10),
 });
 const BuildPackToolSchema = z.object({
-  projectId: z.string().min(1),
+  projectId: z.string().min(1).max(100),
 });
 
-async function handleToolCall(name: string, args: any) {
+async function handleToolCall(name: string, args: any, authed: boolean) {
+  if (WRITE_TOOLS.has(name)) {
+    if (!mcpWriteEnabled()) {
+      return {
+        content: [
+          {
+            type: "text",
+            text: "Write tools are disabled: set MCP_SECRET on the server to enable capture/build-pack.",
+          },
+        ],
+        isError: true,
+      };
+    }
+    if (!authed) {
+      return {
+        content: [
+          { type: "text", text: "Unauthorized: this tool requires a valid MCP bearer token." },
+        ],
+        isError: true,
+      };
+    }
+  }
   if (name === "recallos_capture") {
     const parsed = CaptureToolSchema.parse(args);
     const item = await createCapture(parsed);
@@ -180,8 +232,12 @@ async function handleToolCall(name: string, args: any) {
   return { content: [{ type: "text", text: `Unknown tool: ${name}` }], isError: true };
 }
 
-export async function handleMcp(req: JsonRpcRequest): Promise<JsonRpcResponse> {
+export async function handleMcp(
+  req: JsonRpcRequest,
+  ctx?: { authed?: boolean },
+): Promise<JsonRpcResponse> {
   if (req.jsonrpc !== "2.0") return err(req.id, -32600, "Invalid request");
+  const authed = ctx?.authed ?? false;
   try {
     if (req.method === "initialize") {
       return ok(req.id, {
@@ -201,7 +257,7 @@ export async function handleMcp(req: JsonRpcRequest): Promise<JsonRpcResponse> {
       const args = req.params?.arguments ?? {};
       if (!name) return err(req.id, -32602, "Missing tool name");
       try {
-        const result = await handleToolCall(name, args);
+        const result = await handleToolCall(name, args, authed);
         return ok(req.id, result);
       } catch (toolErr: any) {
         return ok(req.id, {
@@ -223,6 +279,15 @@ export function mcpManifest() {
     description: SERVER_INFO.description,
     transport: "http",
     endpoint: "/api/mcp",
-    tools: TOOLS.map((t) => ({ name: t.name, description: t.description })),
+    auth: {
+      scheme: "Bearer",
+      writeEnabled: mcpWriteEnabled(),
+      note: "Write tools (capture, build-pack) require an Authorization: Bearer <MCP_SECRET> header.",
+    },
+    tools: TOOLS.map((t) => ({
+      name: t.name,
+      description: t.description,
+      requiresAuth: WRITE_TOOLS.has(t.name),
+    })),
   };
 }

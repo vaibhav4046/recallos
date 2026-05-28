@@ -3,6 +3,8 @@ import { z } from "zod";
 import { prisma, getDemoUser } from "@/lib/prisma";
 import { listPrompts } from "@/lib/queries";
 import { improvePrompt } from "@/lib/ai/improvePrompt";
+import { enforce } from "@/lib/ratelimit";
+import { handle } from "@/lib/api";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -20,7 +22,9 @@ const Schema = z.object({
   improve: z.boolean().default(true),
 });
 
-export async function POST(req: Request) {
+export const POST = handle(async (req) => {
+  const blocked = await enforce(req, { name: "prompts", limit: 40, windowMs: 60_000, ai: true });
+  if (blocked) return blocked;
   const body = await req.json().catch(() => null);
   const parsed = Schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "invalid_input" }, { status: 400 });
@@ -44,4 +48,4 @@ export async function POST(req: Request) {
     },
   });
   return NextResponse.json({ prompt });
-}
+});

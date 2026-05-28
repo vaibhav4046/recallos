@@ -39,8 +39,24 @@ export default function SettingsPage() {
     window.location.href = "/api/export";
   }
   async function deleteData() {
-    if (!confirm("This will wipe all captures, projects, prompts, and reminders. Continue?")) return;
-    await fetch("/api/export", { method: "DELETE" });
+    const phrase = window.prompt(
+      'This permanently wipes ALL captures, projects, prompts, and reminders. This cannot be undone.\n\nType "DELETE ALL MY DATA" to confirm:',
+    );
+    if (phrase !== "DELETE ALL MY DATA") {
+      if (phrase !== null) {
+        toast({ kind: "error", title: "Not wiped", body: "Confirmation phrase did not match." });
+      }
+      return;
+    }
+    const res = await fetch("/api/export", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ confirm: phrase }),
+    });
+    if (!res.ok) {
+      toast({ kind: "error", title: "Wipe failed", body: "Please try again." });
+      return;
+    }
     toast({ kind: "success", title: "Memory wiped", body: "Run the seed script to restore demo data." });
   }
 
