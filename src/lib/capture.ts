@@ -3,6 +3,7 @@ import { prisma, getDemoUser } from "./prisma";
 import { detectPlatform } from "./utils";
 import { processItem } from "./ai/processItem";
 import { fetchYouTubeMetadata } from "./enrich/youtube";
+import { embedText, vectorLiteral } from "./embed";
 
 export const CaptureSchema = z.object({
   kind: z.enum([
@@ -142,6 +143,29 @@ export async function createCapture(input: CaptureInput) {
       notes: processed ? "capture+process" : "capture only",
     },
   });
+
+  // Embed for semantic search. Stored as pgvector via raw SQL.
+  try {
+    const embedText_src = [
+      title,
+      processed?.summary,
+      enrichedRaw,
+      tags.join(" "),
+      processed?.category,
+    ]
+      .filter(Boolean)
+      .join("\n");
+    const vec = await embedText(embedText_src);
+    if (vec) {
+      await prisma.$executeRawUnsafe(
+        `UPDATE "CapturedItem" SET embedding = $1::vector WHERE id = $2`,
+        vectorLiteral(vec),
+        item.id,
+      );
+    }
+  } catch (e) {
+    console.warn("[embed] capture skipped", e);
+  }
 
   return item;
 }

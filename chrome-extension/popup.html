@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>RecallOS Capture</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+          sans-serif;
+      }
+      body {
+        width: 340px;
+        margin: 0;
+        background: #07090d;
+        color: #e7ecf3;
+        padding: 14px;
+      }
+      .hero {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+      .logo {
+        width: 28px;
+        height: 28px;
+        border-radius: 8px;
+        border: 1px solid rgba(124, 156, 255, 0.4);
+        background: rgba(124, 156, 255, 0.1);
+        color: #7c9cff;
+        display: grid;
+        place-items: center;
+        font-weight: 700;
+        font-family: ui-monospace, SFMono-Regular, monospace;
+      }
+      h1 {
+        font-size: 13px;
+        margin: 0;
+        font-weight: 600;
+      }
+      .sub {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #6b7689;
+      }
+      .field {
+        margin-bottom: 10px;
+      }
+      label {
+        display: block;
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: #aab4c4;
+        margin-bottom: 4px;
+      }
+      input,
+      textarea,
+      select {
+        width: 100%;
+        box-sizing: border-box;
+        background: #0c1117;
+        color: #e7ecf3;
+        border: 1px solid #1a2230;
+        border-radius: 8px;
+        padding: 7px 9px;
+        font-size: 12px;
+        font-family: inherit;
+        outline: none;
+      }
+      input:focus,
+      textarea:focus,
+      select:focus {
+        border-color: rgba(124, 156, 255, 0.6);
+      }
+      textarea {
+        resize: vertical;
+        min-height: 60px;
+      }
+      .row {
+        display: flex;
+        gap: 6px;
+        margin-top: 12px;
+      }
+      .btn {
+        flex: 1;
+        font-size: 12px;
+        font-weight: 600;
+        padding: 8px 10px;
+        border: 1px solid #1a2230;
+        border-radius: 8px;
+        cursor: pointer;
+        background: #0c1117;
+        color: #aab4c4;
+        font-family: inherit;
+      }
+      .btn:hover {
+        color: #e7ecf3;
+        border-color: #26314a;
+      }
+      .btn-primary {
+        background: #7c9cff;
+        color: #0a1530;
+        border-color: transparent;
+      }
+      .btn-primary:hover {
+        background: #9bb4ff;
+        color: #0a1530;
+      }
+      .status {
+        margin-top: 10px;
+        font-size: 11px;
+        color: #6b7689;
+        min-height: 14px;
+      }
+      .status.ok {
+        color: #3ddc97;
+      }
+      .status.err {
+        color: #ff6b81;
+      }
+      .endpoint-row {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        margin-top: 8px;
+        font-size: 10px;
+        color: #6b7689;
+      }
+      .endpoint-row a {
+        color: #7c9cff;
+        text-decoration: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="hero">
+      <div class="logo">R</div>
+      <div>
+        <h1>Capture to RecallOS</h1>
+        <div class="sub">Stop saving · start building</div>
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="title">Title</label>
+      <input id="title" type="text" />
+    </div>
+    <div class="field">
+      <label for="url">URL</label>
+      <input id="url" type="text" />
+    </div>
+    <div class="field">
+      <label for="note">Note (optional)</label>
+      <textarea id="note" placeholder="Why are you saving this?"></textarea>
+    </div>
+    <div class="field">
+      <label for="intent">Intent</label>
+      <select id="intent">
+        <option value="auto">Auto-decide with AI</option>
+        <option value="remember">Just remember it</option>
+        <option value="project">Turn into project</option>
+        <option value="prompt">Save as prompt</option>
+        <option value="learn">Add to learning queue</option>
+        <option value="jobsearch">Add to job-search vault</option>
+        <option value="reminder">Create reminder</option>
+        <option value="summarize">Summarize only</option>
+      </select>
+    </div>
+
+    <div class="row">
+      <button class="btn" id="cancel">Cancel</button>
+      <button class="btn btn-primary" id="save">Save</button>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <div class="endpoint-row">
+      <span>Endpoint:</span>
+      <a id="endpoint-link" href="#" target="_blank"></a>
+      <a href="#" id="change-endpoint" style="margin-left: auto;">change</a>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
