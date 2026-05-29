@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Search, Command, Plus, Bell, Sparkles, Menu, Brain } from "lucide-react";
+import { Search, Command, Plus, Bell, Sparkles, Menu, Brain, PanelRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 interface SearchHit {
@@ -248,6 +248,15 @@ export function TopBar() {
           ) : null}
         </div>
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            aria-label="Open daily digest"
+            title="Daily digest"
+            className="btn-icon xl:hidden"
+            onClick={() => document.dispatchEvent(new CustomEvent("musemint:mobile-digest"))}
+          >
+            <PanelRight className="h-4 w-4" />
+          </button>
           <Link href="/reminders" className="btn-icon hidden sm:inline-flex" aria-label="Reminders">
             <Bell className="h-4 w-4" />
           </Link>

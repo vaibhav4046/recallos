@@ -4,6 +4,7 @@ import { Sidebar } from "@/components/shell/Sidebar";
 import { TopBar } from "@/components/shell/TopBar";
 import { RightPanel } from "@/components/shell/RightPanel";
 import { MobileNav } from "@/components/shell/MobileNav";
+import { MobileDigest } from "@/components/shell/MobileDigest";
 import { PageTransition } from "@/components/shell/PageTransition";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
@@ -52,6 +53,7 @@ export default function RootLayout({
           <div className="flex min-h-dvh">
             <Sidebar />
             <MobileNav />
+            <MobileDigest />
             <div className="flex min-w-0 flex-1 flex-col">
               <TopBar />
               <div className="flex min-h-0 flex-1">
