@@ -64,4 +64,24 @@ describe("CaptureSchema", () => {
     });
     expect(res.success).toBe(true);
   });
+
+  it("rejects a javascript: url scheme (stored-XSS vector)", () => {
+    const res = CaptureSchema.safeParse({
+      kind: "url",
+      url: "javascript:alert(document.cookie)",
+    });
+    expect(res.success).toBe(false);
+  });
+
+  it("rejects a data: and file: url scheme", () => {
+    expect(
+      CaptureSchema.safeParse({ kind: "url", url: "data:text/html,<script>1</script>" }).success,
+    ).toBe(false);
+    expect(CaptureSchema.safeParse({ kind: "url", url: "file:///etc/passwd" }).success).toBe(false);
+  });
+
+  it("accepts http and https url schemes", () => {
+    expect(CaptureSchema.safeParse({ kind: "url", url: "https://example.com" }).success).toBe(true);
+    expect(CaptureSchema.safeParse({ kind: "url", url: "http://example.com/x" }).success).toBe(true);
+  });
 });

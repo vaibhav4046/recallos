@@ -12,13 +12,17 @@ export function authEnabled(): boolean {
 }
 
 /**
- * Deterministic, non-reversible token derived from the configured password.
- * The raw password is never stored in the cookie; forging the token requires
- * knowing APP_PASSWORD (SHA-256 preimage resistance).
+ * Deterministic, non-reversible token derived from the configured password and
+ * an optional server-side secret. The raw password is never stored in the
+ * cookie; forging the token requires knowing APP_PASSWORD (SHA-256 preimage
+ * resistance). Setting AUTH_SECRET binds the token to a server key that can be
+ * rotated to invalidate every issued cookie at once (so a leaked cookie isn't
+ * a permanent skeleton key).
  */
 export async function expectedToken(): Promise<string> {
   const secret = process.env.APP_PASSWORD ?? "";
-  const data = new TextEncoder().encode(`musemint:auth:${secret}`);
+  const serverSecret = process.env.AUTH_SECRET ?? "";
+  const data = new TextEncoder().encode(`musemint:auth:${secret}:${serverSecret}`);
   const digest = await crypto.subtle.digest("SHA-256", data);
   return Array.from(new Uint8Array(digest))
     .map((b) => b.toString(16).padStart(2, "0"))

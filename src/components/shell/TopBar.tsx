@@ -24,6 +24,10 @@ export function TopBar() {
   const [loading, setLoading] = useState(false);
   const [semantic, setSemantic] = useState(false);
   const [active, setActive] = useState(0);
+  // Mode reflects what the server actually ran (semantic can silently fall back
+  // to keyword), and notice surfaces transient states like rate-limiting.
+  const [mode, setMode] = useState<"keyword" | "semantic">("keyword");
+  const [notice, setNotice] = useState<string | null>(null);
 
   const runSearch = useCallback(
     async (value: string, useSemantic: boolean) => {
@@ -39,13 +43,26 @@ export function TopBar() {
         const res = await fetch(
           `/api/search?q=${encodeURIComponent(trimmed)}${useSemantic ? "&semantic=1" : ""}`,
         );
-        const json = await res.json();
         // Drop stale responses — only the latest query wins.
         if (seq !== seqRef.current) return;
+        if (res.status === 429) {
+          // Don't masquerade rate-limiting as "no results".
+          setHits([]);
+          setNotice("Searching too fast — give it a second.");
+          setActive(0);
+          return;
+        }
+        const json = await res.json();
+        if (seq !== seqRef.current) return;
         setHits(json.items ?? []);
+        setMode(json.mode === "semantic" ? "semantic" : "keyword");
+        setNotice(null);
         setActive(0);
       } catch {
-        if (seq === seqRef.current) setHits([]);
+        if (seq === seqRef.current) {
+          setHits([]);
+          setNotice("Search failed — try again.");
+        }
       } finally {
         if (seq === seqRef.current) setLoading(false);
       }
@@ -86,6 +103,7 @@ export function TopBar() {
     setHits(null);
     setQ("");
     setActive(0);
+    setNotice(null);
     if (debounceRef.current) clearTimeout(debounceRef.current);
   }
 
@@ -179,13 +197,18 @@ export function TopBar() {
               className="absolute left-0 right-0 top-full mt-2 panel max-h-96 overflow-auto p-2"
             >
               <div className="flex items-center justify-between px-2 pb-1.5 text-[11px] text-ink-faint">
-                <span>{semantic ? "Semantic matches" : "Keyword matches"}</span>
+                <span>
+                  {mode === "semantic" ? "Semantic matches" : "Keyword matches"}
+                  {semantic && mode === "keyword" ? " · semantic unavailable" : ""}
+                </span>
                 {!loading && hits.length > 0 ? (
                   <span className="hidden sm:inline">↑↓ to move · ↵ to open · esc to close</span>
                 ) : null}
               </div>
               {loading ? (
                 <div className="px-3 py-2 text-sm text-ink-mute">Searching…</div>
+              ) : notice ? (
+                <div className="px-3 py-2 text-sm text-ink-mute">{notice}</div>
               ) : hits.length === 0 ? (
                 <div className="px-3 py-2 text-sm text-ink-mute">
                   No matches{semantic ? " — try keyword search" : ""}

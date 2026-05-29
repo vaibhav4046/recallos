@@ -2,8 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma, getDemoUser } from "@/lib/prisma";
 import { parseJson } from "@/lib/utils";
 import { handle } from "@/lib/api";
+import { enforce } from "@/lib/ratelimit";
 
-export const POST = handle(async (_req, { params }) => {
+export const POST = handle(async (req, { params }) => {
+  const blocked = await enforce(req, { name: "item-project", limit: 30, windowMs: 60_000 });
+  if (blocked) return blocked;
   const user = await getDemoUser();
   const item = await prisma.capturedItem.findFirst({
     where: { id: params.id, userId: user.id },

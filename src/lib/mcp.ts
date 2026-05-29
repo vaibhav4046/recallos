@@ -7,7 +7,7 @@ import { z } from "zod";
 import { timingSafeEqual } from "node:crypto";
 import { createCapture, CaptureSchema } from "./capture";
 import { listItems, listProjects } from "./queries";
-import { prisma } from "./prisma";
+import { prisma, getDemoUser } from "./prisma";
 import { generateBuildPack, packToMarkdown } from "./ai/generateBuildPack";
 import { parseJson } from "./utils";
 
@@ -210,12 +210,19 @@ async function handleToolCall(name: string, args: any, authed: boolean) {
   }
   if (name === "musemint_generate_build_pack") {
     const parsed = BuildPackToolSchema.parse(args);
-    const project = await prisma.projectIdea.findUnique({ where: { id: parsed.projectId } });
+    // Scope every read by the owner so a valid MCP token can never generate a
+    // pack from another user's project or items (cross-tenant IDOR).
+    const user = await getDemoUser();
+    const project = await prisma.projectIdea.findFirst({
+      where: { id: parsed.projectId, userId: user.id },
+    });
     if (!project) return { content: [{ type: "text", text: "Project not found." }], isError: true };
     const techStack = parseJson<string[]>(project.techStackJson, []);
     const sourceIds = parseJson<string[]>(project.sourceItemsJson, []);
     const sourceItems = sourceIds.length
-      ? await prisma.capturedItem.findMany({ where: { id: { in: sourceIds } } })
+      ? await prisma.capturedItem.findMany({
+          where: { id: { in: sourceIds }, userId: user.id },
+        })
       : [];
     const { pack } = await generateBuildPack({
       projectTitle: project.title,

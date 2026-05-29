@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma, getDemoUser } from "@/lib/prisma";
+import { enforce } from "@/lib/ratelimit";
 
 const Schema = z.object({
   status: z.enum(["due", "done", "snoozed"]).optional(),
-  snoozedTo: z.string().optional(),
-  title: z.string().optional(),
+  snoozedTo: z.string().max(40).optional(),
+  title: z.string().max(280).optional(),
 });
 
 export async function PATCH(req: Request, { params }: { params: { id: string } }) {
+  const blocked = await enforce(req, { name: "reminder-patch", limit: 40, windowMs: 60_000 });
+  if (blocked) return blocked;
   const body = await req.json().catch(() => null);
   const parsed = Schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: "invalid_input" }, { status: 400 });
@@ -28,7 +31,9 @@ export async function PATCH(req: Request, { params }: { params: { id: string } }
   return NextResponse.json({ reminder });
 }
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+  const blocked = await enforce(req, { name: "reminder-delete", limit: 40, windowMs: 60_000 });
+  if (blocked) return blocked;
   const user = await getDemoUser();
   const res = await prisma.reminder.deleteMany({
     where: { id: params.id, userId: user.id },
