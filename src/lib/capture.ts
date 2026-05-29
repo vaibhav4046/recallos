@@ -23,7 +23,15 @@ export const CaptureSchema = z
       "article",
       "text",
     ]),
-    url: z.string().url().optional().or(z.literal("")).optional(),
+    url: z
+      .string()
+      .url()
+      // Only http(s) — reject javascript:, data:, file: and other schemes that
+      // could become a stored-XSS or local-file vector if ever rendered as a link.
+      .refine((u) => /^https?:\/\//i.test(u), "Only http(s) URLs are allowed")
+      .optional()
+      .or(z.literal(""))
+      .optional(),
     title: z.string().min(1).max(280).optional(),
     rawContent: z.string().max(20_000).optional(),
     imageData: z.string().max(9_000_000).optional(),

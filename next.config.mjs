@@ -1,14 +1,19 @@
 /** @type {import('next').NextConfig} */
 
-// Security response headers applied to every route. The CSP keeps the
-// hydration-friendly 'unsafe-inline'/'unsafe-eval' for scripts (required by
-// Next's streaming runtime without a nonce middleware) but locks down
-// object/base/frame/form vectors and forbids framing for clickjacking.
+// Security response headers applied to every route. 'unsafe-inline' stays on
+// script-src because Next's streaming runtime needs inline bootstrap without a
+// nonce middleware, but 'unsafe-eval' is dropped in PRODUCTION (only React Fast
+// Refresh needs it, and that's dev-only) — closing a real script-exec vector.
+// object/base/frame/form are locked down and framing is forbidden (clickjacking).
+const isDev = process.env.NODE_ENV !== "production";
+const scriptSrc = isDev
+  ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+  : "script-src 'self' 'unsafe-inline'";
 const csp = [
   "default-src 'self'",
   "img-src 'self' data: https:",
   "style-src 'self' 'unsafe-inline'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
+  scriptSrc,
   "connect-src 'self'",
   "font-src 'self' data:",
   "object-src 'none'",

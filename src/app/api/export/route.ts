@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { getDemoUser, prisma } from "@/lib/prisma";
+import { enforce } from "@/lib/ratelimit";
 
-export async function GET() {
+export async function GET(req: Request) {
+  // Full-data dump — throttle to deter scraping of the whole dataset.
+  const blocked = await enforce(req, { name: "export", limit: 6, windowMs: 60_000 });
+  if (blocked) return blocked;
   const user = await getDemoUser();
   const [items, projects, prompts, reminders, integrations, buildPacks] =
     await Promise.all([
@@ -33,6 +37,8 @@ export async function GET() {
 const WIPE_PHRASES = new Set(["DELETE ALL MY DATA", "DELETE"]);
 
 export async function DELETE(req: Request) {
+  const blocked = await enforce(req, { name: "wipe", limit: 4, windowMs: 60_000 });
+  if (blocked) return blocked;
   // Irreversible wipe — require an explicit typed confirmation phrase.
   const body = await req.json().catch(() => null);
   const confirm =

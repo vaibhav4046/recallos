@@ -6,12 +6,18 @@ function reqWith(headers: Record<string, string>): Request {
 }
 
 describe("rate limiting", () => {
-  it("clientIp prefers the first x-forwarded-for entry", () => {
-    expect(clientIp(reqWith({ "x-forwarded-for": "1.2.3.4, 5.6.7.8" }))).toBe("1.2.3.4");
+  it("clientIp uses the right-most (trusted) x-forwarded-for hop, not the spoofable left-most", () => {
+    // The left-most XFF value is client-supplied and forgeable; the right-most
+    // is the one added closest to our server. Keying on the right-most prevents
+    // an attacker from minting a fresh limiter bucket per request.
+    expect(clientIp(reqWith({ "x-forwarded-for": "1.2.3.4, 5.6.7.8" }))).toBe("5.6.7.8");
   });
 
-  it("clientIp falls back x-real-ip -> cf-connecting-ip -> unknown", () => {
-    expect(clientIp(reqWith({ "x-real-ip": "9.9.9.9" }))).toBe("9.9.9.9");
+  it("clientIp prefers platform headers x-real-ip -> cf-connecting-ip over forgeable XFF", () => {
+    // A trustworthy platform header wins even when an attacker also sends XFF.
+    expect(
+      clientIp(reqWith({ "x-real-ip": "9.9.9.9", "x-forwarded-for": "1.2.3.4" })),
+    ).toBe("9.9.9.9");
     expect(clientIp(reqWith({ "cf-connecting-ip": "8.8.8.8" }))).toBe("8.8.8.8");
     expect(clientIp(reqWith({}))).toBe("unknown");
   });

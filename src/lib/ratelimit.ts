@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma, getDemoUser } from "./prisma";
+import { activeProviderName } from "./ai/provider";
 
 // ---------------------------------------------------------------------------
 // Per-IP sliding-window limiter (in-memory, best-effort).
@@ -24,13 +25,22 @@ function sweep(now: number) {
 }
 
 export function clientIp(req: Request): string {
+  // Prefer platform-injected, trustworthy client-IP headers. On Vercel
+  // `x-real-ip` is set by the edge to the true client IP and cannot be forged
+  // by the caller. Only fall back to X-Forwarded-For's *right-most* hop (the
+  // one added closest to our server) — never the left-most value, which is
+  // attacker-controlled and would let a client mint a fresh limiter bucket
+  // per request by rotating the header.
+  const real = req.headers.get("x-real-ip")?.trim();
+  if (real) return real;
+  const cf = req.headers.get("cf-connecting-ip")?.trim();
+  if (cf) return cf;
   const xff = req.headers.get("x-forwarded-for");
-  if (xff) return xff.split(",")[0].trim() || "unknown";
-  return (
-    req.headers.get("x-real-ip") ||
-    req.headers.get("cf-connecting-ip") ||
-    "unknown"
-  );
+  if (xff) {
+    const hops = xff.split(",").map((h) => h.trim()).filter(Boolean);
+    if (hops.length) return hops[hops.length - 1];
+  }
+  return "unknown";
 }
 
 export type RateResult = {
@@ -80,6 +90,7 @@ export async function aiBudget(): Promise<{
   used: number;
   limit: number;
   remaining: number;
+  degraded: boolean;
 }> {
   const limit = dailyBudget();
   try {
@@ -89,10 +100,12 @@ export async function aiBudget(): Promise<{
     const used = await prisma.aiProcessingLog.count({
       where: { userId: user.id, createdAt: { gte: start } },
     });
-    return { used, limit, remaining: Math.max(0, limit - used) };
+    return { used, limit, remaining: Math.max(0, limit - used), degraded: false };
   } catch {
-    // If the budget can't be read, fail open rather than blocking the app.
-    return { used: 0, limit, remaining: limit };
+    // Budget read failed. Default to fail-CLOSED (remaining 0) so a DB blip
+    // can't uncap paid-AI spend; callers decide whether to honor this based on
+    // the active provider (a free/mock provider has no cost to protect).
+    return { used: limit, limit, remaining: 0, degraded: true };
   }
 }
 
@@ -129,8 +142,15 @@ export async function enforce(
   if (opts.ai) {
     const budget = await aiBudget();
     if (budget.remaining <= 0) {
+      // Fail-open ONLY when the budget read degraded AND no paid provider is
+      // active (mock has no cost). Otherwise block: either the budget is truly
+      // exhausted, or we couldn't verify spend while a paid provider is live.
+      const paidProvider = activeProviderName() !== "mock";
+      if (budget.degraded && !paidProvider) return null;
       return tooMany(
-        `Daily AI budget reached (${budget.used}/${budget.limit}). It resets at midnight.`,
+        budget.degraded
+          ? "AI temporarily unavailable (budget check failed). Try again shortly."
+          : `Daily AI budget reached (${budget.used}/${budget.limit}). It resets at midnight.`,
       );
     }
   }
