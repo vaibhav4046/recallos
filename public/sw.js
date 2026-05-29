@@ -79,8 +79,9 @@ self.addEventListener("notificationclick", (event) => {
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((clients) => {
       for (const client of clients) {
         if ("focus" in client) {
-          client.navigate(target);
-          return client.focus();
+          return Promise.resolve(
+            "navigate" in client ? client.navigate(target).catch(() => undefined) : undefined,
+          ).then(() => client.focus());
         }
       }
       return self.clients.openWindow(target);

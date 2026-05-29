@@ -28,6 +28,6 @@ export const POST = handle(async (req) => {
     return NextResponse.json({ error: "invalid_input", issues: parsed.error.flatten() }, { status: 400 });
   }
   const user = await getDemoUser();
-  saveSubscription({ ...parsed.data, userId: user.id });
+  await saveSubscription({ ...parsed.data, userId: user.id });
   return NextResponse.json({ ok: true });
 });
