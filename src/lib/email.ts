@@ -31,8 +31,12 @@ export async function sendEmail(input: EmailInput): Promise<boolean> {
       },
       body: JSON.stringify({ from, to, subject: input.subject, html: input.html, text: input.text }),
     });
+    if (!res.ok) {
+      console.error("[email] Resend rejected", res.status, await res.text().catch(() => ""));
+    }
     return res.ok;
-  } catch {
+  } catch (err) {
+    console.error("[email] send failed", err);
     return false;
   }
 }

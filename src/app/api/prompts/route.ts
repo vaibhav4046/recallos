@@ -15,10 +15,10 @@ export async function GET() {
 }
 
 const Schema = z.object({
-  title: z.string().min(1),
-  body: z.string().min(1),
-  category: z.string().default("general"),
-  tags: z.array(z.string()).default([]),
+  title: z.string().min(1).max(280),
+  body: z.string().min(1).max(20_000),
+  category: z.string().max(60).default("general"),
+  tags: z.array(z.string().max(40)).max(20).default([]),
   improve: z.boolean().default(true),
 });
 

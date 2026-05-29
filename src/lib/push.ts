@@ -39,7 +39,7 @@ export interface PushPayload {
 export async function broadcastPush(userId: string, payload: PushPayload): Promise<number> {
   if (!isPushEnabled()) return 0;
   ensureConfigured();
-  const subs = listSubscriptions(userId);
+  const subs = await listSubscriptions(userId);
   let sent = 0;
   await Promise.all(
     subs.map(async (s) => {
@@ -52,7 +52,7 @@ export async function broadcastPush(userId: string, payload: PushPayload): Promi
       } catch (err: unknown) {
         // 404/410 → subscription is dead; drop it so we stop retrying.
         const code = (err as { statusCode?: number })?.statusCode;
-        if (code === 404 || code === 410) removeSubscription(s.endpoint);
+        if (code === 404 || code === 410) await removeSubscription(s.endpoint);
       }
     }),
   );

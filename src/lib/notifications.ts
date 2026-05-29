@@ -46,7 +46,7 @@ export async function buildPendingSummary(userId?: string): Promise<PendingSumma
     pending,
     forgottenGems,
     readyToBuild,
-    topPending: topRows.map((r) => ({ id: r.id, title: r.title })),
+    topPending: topRows,
   };
 }
 
