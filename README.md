@@ -80,23 +80,28 @@ npm run dev                # http://localhost:3000
 
 ## Environment variables
 
-See [`.env.example`](.env.example).
+Every variable is **optional** — see [`.env.example`](.env.example) for the full, annotated list. With an empty file the app runs as an open single-user demo on local SQLite with the deterministic mock AI provider.
 
 ```bash
-DATABASE_URL="file:./dev.db"
+DATABASE_URL="file:./dev.db"      # or a postgres:// URL for Neon/Supabase
 
-# At least one is recommended; if all are blank, the mock provider is used.
+# AI — first non-empty wins; mock provider if all blank.
 GOOGLE_API_KEY=""
 OPENAI_API_KEY=""
 ANTHROPIC_API_KEY=""
 GROQ_API_KEY=""
+MISTRAL_API_KEY=""
 
-YOUTUBE_API_KEY=""
-NEXTAUTH_SECRET=""
-NEXTAUTH_URL="http://localhost:3000"
+YOUTUBE_API_KEY=""                # optional enrichment (YouTube Data API v3)
+
+# Auth — opt-in single-password gate. Blank = open demo.
+APP_PASSWORD=""
+AUTH_SECRET=""                    # optional; rotating it logs everyone out
 ```
 
-The provider is picked in priority order: **Gemini → OpenAI → Anthropic → Groq → Mock**. See [`src/lib/ai/provider.ts`](src/lib/ai/provider.ts).
+Notifications (Web Push / email digest / cron) and security knobs (`MCP_SECRET`, `MUSEMINT_DAILY_AI_BUDGET`) are documented in `.env.example`; all stay dormant until configured.
+
+The provider is picked in priority order: **Gemini → OpenAI → Anthropic → Groq → Mistral → Mock**. See [`src/lib/ai/provider.ts`](src/lib/ai/provider.ts).
 
 ## Run commands
 
@@ -207,6 +212,30 @@ Set `YOUTUBE_API_KEY` (separate from `GOOGLE_API_KEY` so it can be restricted to
 - **Chrome extension, iOS share extension, Android share target** are wired in the integrations page as `coming_soon` — the data model already supports captures from those sources.
 - **MCP server, Telegram bot, Notion export, GitHub issue export** are stubbed integrations; the underlying schemas + APIs support them and the next slice is mostly transport code.
 - **YouTube official import** requires `YOUTUBE_API_KEY`; without it the integration is shown as `available` but not active.
+
+## Authentication model
+
+Musemint is intentionally **single-user**: one deployment is one person's memory
+vault. There are two modes, chosen by whether `APP_PASSWORD` is set:
+
+| Mode | `APP_PASSWORD` | Who can access | Data wipe (`DELETE /api/export`) |
+| --- | --- | --- | --- |
+| **Open demo** | unset | anyone with the URL | **disabled** (returns 403) |
+| **Private instance** | set | whoever knows the password | enabled for the owner |
+
+When a password is set, `middleware.ts` gates every route: visitors enter it once
+on `/login` and receive an httpOnly cookie holding a SHA-256 token derived from
+`APP_PASSWORD` (+ optional `AUTH_SECRET`). The raw password is never stored in the
+cookie, comparison is constant-time, and the gate is edge-safe (Web Crypto only).
+The machine-to-machine cron route (`/api/notifications/run`) is exempt because it
+carries its own timing-safe bearer secret.
+
+**Multi-tenancy (per-account login, org sharing) is explicitly out of scope** for
+this build. It is deliberately deferred, not forgotten: the bundled Claude skill
+and MCP/REST surface are designed around keyless single-user access, so true
+multi-tenancy is a separate milestone that would touch the data model, the skill
+transport, and the auth layer together. For shared use today, run one instance
+per person.
 
 ## Security & privacy notes
 
