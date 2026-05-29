@@ -3,6 +3,38 @@ import { parseJson } from "./utils";
 
 export type ItemWithMeta = Awaited<ReturnType<typeof listItems>>[number];
 
+const SEARCH_FIELDS = [
+  "title",
+  "summary",
+  "category",
+  "sourcePlatform",
+  "tagsJson",
+  "rawContent",
+] as const;
+
+/**
+ * Build a Prisma `AND` filter from a free-text query.
+ *
+ * - Case-insensitive: typing "never gonna" must find "Never Gonna Give You Up".
+ * - Tokenized + AND'd: loose, out-of-order keywords still match (each token must
+ *   appear in at least one field), so an impatient user who half-remembers a
+ *   title still lands on it. Returns null for an empty/whitespace query.
+ */
+export function buildSearchFilter(search: string) {
+  const tokens = search
+    .toLowerCase()
+    .split(/\s+/)
+    .map((t) => t.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+  if (!tokens.length) return null;
+  return tokens.map((tok) => ({
+    OR: SEARCH_FIELDS.map((f) => ({
+      [f]: { contains: tok, mode: "insensitive" as const },
+    })),
+  }));
+}
+
 const EMPTY_TITLE_PATTERNS = [/^untitled capture$/i, /^untitled$/i];
 
 function looksEmpty(item: {
@@ -27,14 +59,8 @@ export async function listItems(opts?: {
   const where: any = { userId: user.id };
   if (opts?.status) where.status = opts.status;
   if (opts?.search) {
-    const q = opts.search;
-    where.OR = [
-      { title: { contains: q } },
-      { summary: { contains: q } },
-      { category: { contains: q } },
-      { sourcePlatform: { contains: q } },
-      { tagsJson: { contains: q } },
-    ];
+    const and = buildSearchFilter(opts.search);
+    if (and) where.AND = and;
   }
   const items = await prisma.capturedItem.findMany({
     where,
