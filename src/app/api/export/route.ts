@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getDemoUser, prisma } from "@/lib/prisma";
 import { enforce } from "@/lib/ratelimit";
+import { authEnabled } from "@/lib/auth";
 
 export async function GET(req: Request) {
   // Full-data dump — throttle to deter scraping of the whole dataset.
@@ -37,6 +38,21 @@ export async function GET(req: Request) {
 const WIPE_PHRASES = new Set(["DELETE ALL MY DATA", "DELETE"]);
 
 export async function DELETE(req: Request) {
+  // Destructive + irreversible. The confirmation phrase below is published in
+  // this route's own 400 response, so it is not a secret — on the open demo
+  // (no APP_PASSWORD, no caller identity) anyone could wipe the dataset. Refuse
+  // unless the instance is password-protected; when it is, middleware has
+  // already verified the caller owns the instance.
+  if (!authEnabled()) {
+    return NextResponse.json(
+      {
+        error: "disabled",
+        message:
+          "Data wipe is disabled on the open demo. Set APP_PASSWORD to enable it for the instance owner.",
+      },
+      { status: 403 },
+    );
+  }
   const blocked = await enforce(req, { name: "wipe", limit: 4, windowMs: 60_000 });
   if (blocked) return blocked;
   // Irreversible wipe — require an explicit typed confirmation phrase.

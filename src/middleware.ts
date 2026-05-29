@@ -19,6 +19,11 @@ function isPublic(pathname: string): boolean {
   return (
     pathname === "/login" ||
     pathname.startsWith("/api/login") ||
+    // The cron digest is machine-to-machine: it carries its own timing-safe
+    // bearer secret (NOTIFY_SECRET / CRON_SECRET) and never a login cookie, so
+    // it must skip the password gate or the daily job 401s once APP_PASSWORD is
+    // set. The route handler still rejects anyone without the bearer.
+    pathname === "/api/notifications/run" ||
     PUBLIC_FILES.has(pathname)
   );
 }
