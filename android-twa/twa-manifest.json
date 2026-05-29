@@ -4,14 +4,13 @@
   "name": "Musemint — Stop saving. Start building.",
   "launcherName": "Musemint",
   "display": "standalone",
-  "orientation": "portrait",
-  "themeColor": "#07090d",
-  "themeColorDark": "#07090d",
-  "navigationColor": "#07090d",
-  "navigationColorDark": "#07090d",
-  "navigationDividerColor": "#07090d",
-  "navigationDividerColorDark": "#07090d",
-  "backgroundColor": "#07090d",
+  "themeColor": "#07090D",
+  "themeColorDark": "#07090D",
+  "navigationColor": "#07090D",
+  "navigationColorDark": "#07090D",
+  "navigationDividerColor": "#07090D",
+  "navigationDividerColorDark": "#07090D",
+  "backgroundColor": "#07090D",
   "enableNotifications": true,
   "startUrl": "/dashboard?source=twa",
   "iconUrl": "https://recallos-vaibhav4046s-projects.vercel.app/icon-512.png",
@@ -22,7 +21,7 @@
     "alias": "musemint"
   },
   "appVersionName": "1.0.0",
-  "appVersionCode": 1,
+  "appVersionCode": 2,
   "shortcuts": [
     {
       "name": "Capture something",
@@ -40,14 +39,19 @@
   "generatorApp": "bubblewrap-cli",
   "webManifestUrl": "https://recallos-vaibhav4046s-projects.vercel.app/manifest.webmanifest",
   "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
   "enableSiteSettingsShortcut": true,
   "isChromeOSOnly": false,
   "isMetaQuest": false,
   "fullScopeUrl": "https://recallos-vaibhav4046s-projects.vercel.app/",
   "minSdkVersion": 21,
-  "features": {},
-  "alphaDependencies": {
-    "enabled": false
-  },
-  "fingerprints": []
+  "orientation": "portrait",
+  "fingerprints": [],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "displayOverride": [],
+  "appVersion": "1.0.0"
 }
