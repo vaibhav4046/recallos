@@ -101,7 +101,7 @@ export function NotificationsClient() {
       type="button"
       onClick={enable}
       disabled={busy}
-      className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-bg-panel/90 px-4 py-2 text-sm text-ink shadow-lg backdrop-blur-md transition-colors hover:border-accent/70 disabled:opacity-60"
+      className="fixed bottom-20 left-4 z-40 inline-flex items-center gap-2 rounded-full border border-accent/40 bg-bg-panel/90 px-4 py-2 text-sm text-ink shadow-lg backdrop-blur-md transition-colors hover:border-accent/70 disabled:opacity-60 md:bottom-6 md:left-6"
       aria-label="Enable notifications"
     >
       <Bell className="h-4 w-4 text-accent" />

@@ -1,7 +1,8 @@
 "use client";
 import { Badge, ScoreBar } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { formatRelative, platformLabel } from "@/lib/utils";
+import { TimeAgo } from "@/components/ui/TimeAgo";
+import { platformLabel } from "@/lib/utils";
 import {
   Youtube,
   Linkedin,
@@ -15,7 +16,7 @@ import {
   Hammer,
   Bell,
 } from "lucide-react";
-import { ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 
 type ItemLike = {
   id: string;
@@ -48,13 +49,13 @@ function PlatformGlyph({ platform }: { platform: string }) {
   );
 }
 
-export function ItemCard({
+function ItemCardBase({
   item,
   onAction,
   compact,
 }: {
   item: ItemLike;
-  onAction?: (action: "keep" | "archive" | "project" | "prompt" | "reminder") => void;
+  onAction?: (id: string, action: "keep" | "archive" | "project" | "prompt" | "reminder") => void;
   compact?: boolean;
 }) {
   return (
@@ -65,7 +66,7 @@ export function ItemCard({
           <div className="flex items-center gap-2 text-[11px] uppercase tracking-wider text-ink-mute">
             <span>{platformLabel(item.sourcePlatform)}</span>
             <span>·</span>
-            <span>{formatRelative(item.createdAt)}</span>
+            <TimeAgo date={item.createdAt} />
             {item.category ? (
               <>
                 <span>·</span>
@@ -112,19 +113,19 @@ export function ItemCard({
 
       {onAction ? (
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
-          <Button size="sm" onClick={() => onAction("keep")}>
+          <Button size="sm" onClick={() => onAction(item.id, "keep")}>
             Keep
           </Button>
-          <Button size="sm" onClick={() => onAction("archive")}>
+          <Button size="sm" onClick={() => onAction(item.id, "archive")}>
             <Archive className="h-3.5 w-3.5" /> Archive
           </Button>
-          <Button size="sm" variant="primary" onClick={() => onAction("project")}>
+          <Button size="sm" variant="primary" onClick={() => onAction(item.id, "project")}>
             <Hammer className="h-3.5 w-3.5" /> Turn into project
           </Button>
-          <Button size="sm" onClick={() => onAction("prompt")}>
+          <Button size="sm" onClick={() => onAction(item.id, "prompt")}>
             <Sparkles className="h-3.5 w-3.5" /> Save as prompt
           </Button>
-          <Button size="sm" onClick={() => onAction("reminder")}>
+          <Button size="sm" onClick={() => onAction(item.id, "reminder")}>
             <Bell className="h-3.5 w-3.5" /> Add reminder
           </Button>
         </div>
@@ -132,3 +133,6 @@ export function ItemCard({
     </article>
   );
 }
+
+ItemCardBase.displayName = "ItemCard";
+export const ItemCard = memo(ItemCardBase);

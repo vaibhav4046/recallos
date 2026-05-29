@@ -15,7 +15,7 @@ import {
   Trophy,
   Inbox,
 } from "lucide-react";
-import { formatRelative } from "@/lib/utils";
+import { TimeAgo } from "@/components/ui/TimeAgo";
 
 export const dynamic = "force-dynamic";
 
@@ -159,7 +159,7 @@ export default async function DashboardPage() {
                   <div>
                     <div className="text-sm text-ink">{r.title}</div>
                     <div className="text-[11px] uppercase tracking-wider text-ink-mute">
-                      Due {formatRelative(r.dueAt)}
+                      Due <TimeAgo date={r.dueAt} />
                     </div>
                   </div>
                 </div>
@@ -183,7 +183,7 @@ export default async function DashboardPage() {
                 </div>
                 <div className="mt-0.5 text-sm text-ink line-clamp-2">{it.title}</div>
                 <div className="mt-2 flex items-center justify-between text-[11px] text-ink-mute">
-                  <span>{formatRelative(it.createdAt)}</span>
+                  <TimeAgo date={it.createdAt} />
                   <Link href="/inbox" className="text-accent hover:text-accent-glow">
                     Triage →
                   </Link>

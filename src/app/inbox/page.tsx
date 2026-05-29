@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ItemCard } from "@/components/ItemCard";
 import { Card, CardHeader } from "@/components/ui/Card";
@@ -35,6 +35,16 @@ const STATUSES = [
   { key: "archived", label: "Archived" },
 ] as const;
 
+async function patch(id: string, body: Record<string, unknown>) {
+  const res = await fetch(`/api/items/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  if (!res.ok) throw new Error("Action failed");
+  return res.json();
+}
+
 export default function InboxPage() {
   const toast = useToast();
   const sp = useSearchParams();
@@ -46,17 +56,16 @@ export default function InboxPage() {
   const [focused, setFocused] = useState<string | null>(focusId);
   const focusHandled = useRef<string | null>(null);
 
-  async function load() {
+  const load = useCallback(async () => {
     const res = await fetch(`/api/items?status=${filter}`);
     const json = await res.json();
     setItems(json.items);
-  }
+  }, [filter]);
 
   useEffect(() => {
     setItems(null);
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [filter]);
+  }, [load]);
 
   // A search result can point at an item in any status. Look up the focused
   // item, switch to its tab so it's actually visible, then highlight + scroll.
@@ -106,17 +115,7 @@ export default function InboxPage() {
     });
   }, [items, category, q]);
 
-  async function patch(id: string, body: any) {
-    const res = await fetch(`/api/items/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) throw new Error("Action failed");
-    return res.json();
-  }
-
-  async function onAction(id: string, action: "keep" | "archive" | "project" | "prompt" | "reminder") {
+  const onAction = useCallback(async (id: string, action: "keep" | "archive" | "project" | "prompt" | "reminder") => {
     try {
       if (action === "keep") {
         await patch(id, { status: "kept" });
@@ -170,7 +169,7 @@ export default function InboxPage() {
     } catch (err: any) {
       toast({ kind: "error", title: "Action failed", body: err.message });
     }
-  }
+  }, [items, toast, load]);
 
   return (
     <div className="space-y-6">
@@ -265,10 +264,7 @@ export default function InboxPage() {
                   : "ring-0"
               }`}
             >
-              <ItemCard
-                item={{ ...item, createdAt: item.createdAt }}
-                onAction={(a) => onAction(item.id, a)}
-              />
+              <ItemCard item={item} onAction={onAction} />
             </div>
           ))}
         </div>
