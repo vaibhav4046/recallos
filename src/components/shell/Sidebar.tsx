@@ -133,6 +133,15 @@ export function Sidebar() {
             Personal workspace
           </div>
         </div>
+        <div className="flex items-center gap-2 px-2.5 pt-1 text-[11px] text-ink-mute">
+          <Link href="/privacy" className="hover:text-ink-soft">
+            Privacy
+          </Link>
+          <span className="text-line">·</span>
+          <Link href="/terms" className="hover:text-ink-soft">
+            Terms
+          </Link>
+        </div>
       </div>
     </aside>
   );
