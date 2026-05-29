@@ -8,6 +8,7 @@ import { MobileDigest } from "@/components/shell/MobileDigest";
 import { PageTransition } from "@/components/shell/PageTransition";
 import { ToastProvider } from "@/components/ui/Toast";
 import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
+import { NotificationsClient } from "@/components/NotificationsClient";
 
 export const metadata: Metadata = {
   applicationName: "Musemint",
@@ -50,6 +51,7 @@ export default function RootLayout({
       <body className="min-h-dvh bg-bg text-ink antialiased">
         <ToastProvider>
           <ServiceWorkerRegister />
+          <NotificationsClient />
           <div className="flex min-h-dvh">
             <Sidebar />
             <MobileNav />
