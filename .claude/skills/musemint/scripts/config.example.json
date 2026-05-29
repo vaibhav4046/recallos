@@ -1,0 +1,4 @@
+{
+  "baseUrl": "https://recallos-vaibhav4046s-projects.vercel.app",
+  "note": "Copy to config.json and set your own instance URL. No API key needed for REST on the single-user instance. Set MCP_SECRET only if you enable MCP write tools."
+}
