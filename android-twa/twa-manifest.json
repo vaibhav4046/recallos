@@ -1,0 +1,53 @@
+{
+  "packageId": "app.musemint.twa",
+  "host": "recallos-vaibhav4046s-projects.vercel.app",
+  "name": "Musemint — Stop saving. Start building.",
+  "launcherName": "Musemint",
+  "display": "standalone",
+  "orientation": "portrait",
+  "themeColor": "#07090d",
+  "themeColorDark": "#07090d",
+  "navigationColor": "#07090d",
+  "navigationColorDark": "#07090d",
+  "navigationDividerColor": "#07090d",
+  "navigationDividerColorDark": "#07090d",
+  "backgroundColor": "#07090d",
+  "enableNotifications": true,
+  "startUrl": "/dashboard?source=twa",
+  "iconUrl": "https://recallos-vaibhav4046s-projects.vercel.app/icon-512.png",
+  "maskableIconUrl": "https://recallos-vaibhav4046s-projects.vercel.app/icon-maskable-512.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "./android-keystore.jks",
+    "alias": "musemint"
+  },
+  "appVersionName": "1.0.0",
+  "appVersionCode": 1,
+  "shortcuts": [
+    {
+      "name": "Capture something",
+      "shortName": "Capture",
+      "url": "/capture?source=twa",
+      "chosenIconUrl": "https://recallos-vaibhav4046s-projects.vercel.app/icon-192.png"
+    },
+    {
+      "name": "Open inbox",
+      "shortName": "Inbox",
+      "url": "/inbox",
+      "chosenIconUrl": "https://recallos-vaibhav4046s-projects.vercel.app/icon-192.png"
+    }
+  ],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://recallos-vaibhav4046s-projects.vercel.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "fullScopeUrl": "https://recallos-vaibhav4046s-projects.vercel.app/",
+  "minSdkVersion": 21,
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "fingerprints": []
+}

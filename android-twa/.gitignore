@@ -1,0 +1,29 @@
+# --- Secrets: never commit signing material ---
+*.jks
+*.keystore
+android-keystore.jks
+*.pepk
+
+# --- Build artifacts ---
+*.apk
+*.aab
+*.idsig
+
+# --- Bubblewrap / Gradle generated Android project ---
+# `bubblewrap build` scaffolds a full Android Studio project into this folder.
+# Only the reviewable spec (twa-manifest.json), the build script, the README,
+# and the assetlinks template are tracked; everything generated is ignored.
+app/
+gradle/
+.gradle/
+build/
+gradlew
+gradlew.bat
+build.gradle
+settings.gradle
+gradle.properties
+local.properties
+store_icon.png
+
+# A locally downloaded JDK 17 (if placed inside this folder)
+jdk-17*/
