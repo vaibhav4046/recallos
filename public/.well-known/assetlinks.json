@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "app.musemint.twa",
+      "sha256_cert_fingerprints": [
+        "33:ED:53:9E:E5:02:62:11:07:B6:C2:9E:C5:73:33:F1:68:CE:CE:17:45:07:68:03:31:78:4A:DE:BD:A9:DC:84"
+      ]
+    }
+  }
+]

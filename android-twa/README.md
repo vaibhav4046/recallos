@@ -11,7 +11,8 @@ URL bar) — so the app always matches production and there is no second codebas
 | File | Purpose |
 | --- | --- |
 | `twa-manifest.json` | The build spec — package id, host, colors, icons, shortcuts. Mirrors `public/manifest.webmanifest`. **Review this.** |
-| `build.ps1` | Turnkey build: validates the toolchain, builds the signed APK/AAB, and writes `public/.well-known/assetlinks.json`. |
+| `build.ps1` | Turnkey build: validates the toolchain, creates the signing keystore on first run, builds the signed APK/AAB, and writes `public/.well-known/assetlinks.json`. |
+| `bw-build.js` | Non-interactive driver that `build.ps1` invokes — calls Bubblewrap's exported `build()` with a stub prompt so the build never blocks on a TTY prompt (CI-safe). |
 | `assetlinks.template.json` | Digital Asset Links template; the build fills in the real cert fingerprint. |
 | `.gitignore` | Keeps secrets (keystore), binaries (`*.apk`/`*.aab`), and the generated Android project out of git. |
 
@@ -34,10 +35,18 @@ APK/AAB) is intentionally **not** committed.
 .\build.ps1 -JdkPath "C:\path\to\jdk-17"
 ```
 
-On the **first** run Bubblewrap prompts you to create a signing keystore and set
-its passwords. Save those passwords — the **same keystore must sign every future
-update**, or Google Play will reject the upload. The keystore
-(`android-keystore.jks`) stays local and is gitignored.
+On the **first** run the script generates the signing keystore for you
+(`android-keystore.jks`, alias `musemint`) with a strong random password and
+writes that password to `keystore-credentials.txt`. **Back that file up and keep
+it secret** — the *same* keystore must sign every future update, or Google Play
+rejects the upload. Both files stay local and are gitignored.
+
+For **later** builds the keystore already exists, so pass the same password back
+(find it in `keystore-credentials.txt`):
+
+```powershell
+.\build.ps1 -JdkPath "C:\path\to\jdk-17" -KeystorePassword "<your-store-password>"
+```
 
 Outputs:
 - `app-release-signed.apk` — sideload/test build (`adb install -r app-release-signed.apk`)

@@ -3,11 +3,13 @@
 *.keystore
 android-keystore.jks
 *.pepk
+keystore-credentials.txt
 
 # --- Build artifacts ---
 *.apk
 *.aab
 *.idsig
+*.log
 
 # --- Bubblewrap / Gradle generated Android project ---
 # `bubblewrap build` scaffolds a full Android Studio project into this folder.
@@ -24,6 +26,7 @@ settings.gradle
 gradle.properties
 local.properties
 store_icon.png
+manifest-checksum.txt
 
 # A locally downloaded JDK 17 (if placed inside this folder)
 jdk-17*/
