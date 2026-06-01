@@ -204,13 +204,15 @@ Set `YOUTUBE_API_KEY` (separate from `GOOGLE_API_KEY` so it can be restricted to
 
 ## Platform limitations
 
-- **LinkedIn / Instagram saved posts** cannot be programmatically scraped without violating ToS. Musemint supports them via:
+- **LinkedIn / Instagram saved posts** are never scraped (it violates ToS). Musemint supports them via:
   - the native share sheet,
   - pasted URL,
   - screenshot upload + OCR,
-  - browser extension (planned).
+  - browser extension (planned),
+  - **Instagram only** — the official Instagram Graph API (Business/Creator): the user authorizes their *own* account via OAuth, no scraping. Dormant until `INSTAGRAM_APP_ID` / `INSTAGRAM_APP_SECRET` are set.
 - **Chrome extension, iOS share extension, Android share target** are wired in the integrations page as `coming_soon` — the data model already supports captures from those sources.
-- **MCP server, Telegram bot, Notion export, GitHub issue export** are stubbed integrations; the underlying schemas + APIs support them and the next slice is mostly transport code.
+- **MCP server** is live: a JSON-RPC 2.0 endpoint at `/api/mcp` (read tools open; write tools — capture, build-pack — gated by `MCP_SECRET`). Connect from any MCP client, e.g. `claude mcp add --transport http musemint <your-app-url>/api/mcp`.
+- **Telegram bot, Notion export, GitHub issue export** remain stubbed; the schemas + APIs support them and the next slice is mostly transport code.
 - **YouTube official import** requires `YOUTUBE_API_KEY`; without it the integration is shown as `available` but not active.
 
 ## Authentication model
@@ -240,7 +242,7 @@ per person.
 ## Security & privacy notes
 
 - API keys are read only from `process.env`. They are **never** rendered to the client and the Settings page only exposes a boolean "configured" flag.
-- Default storage is local SQLite. Set `DATABASE_URL=postgres://…` to migrate to Postgres / Supabase.
+- Storage is Postgres with the pgvector extension (Vercel Postgres / Neon / Supabase), configured via `DATABASE_URL`.
 - The capture flow does not log raw secrets and the AI provider layer never persists prompts outside the database.
 - Privacy controls in the UI: local-first toggle, full JSON export, complete memory wipe (`DELETE /api/export`).
 - No third-party scraping. Private-network captures (LinkedIn, Instagram) require the user to act — Musemint only processes what arrives through the share sheet, paste, or screenshot.
@@ -251,19 +253,20 @@ per person.
 - [ ] Android share target
 - [ ] Chrome browser extension
 - [ ] YouTube OAuth import (liked + watch later)
-- [ ] Real screenshot OCR (Tesseract / cloud OCR)
+- [x] Real screenshot OCR (Gemini vision)
 - [ ] Telegram bot capture
-- [ ] **MCP server** exposing captured memory as tools
+- [x] **MCP server** exposing captured memory as tools (live; reads open, writes via `MCP_SECRET`)
+- [x] Instagram official Graph API integration (Business/Creator, OAuth)
 - [ ] VS Code extension
 - [ ] Notion export
 - [ ] GitHub Issues export from build packs
-- [ ] Vector embeddings + semantic search (the abstraction is already keyword-only but pluggable)
+- [x] Vector embeddings + semantic search (pgvector)
 - [ ] Local-first encrypted storage
 
 ## What was built
 
-- 14 routes (`/`, `/dashboard`, `/inbox`, `/capture`, `/ready-to-build`, `/build-packs/[id]`, `/memory-graph`, `/prompts`, `/learning`, `/job-search`, `/content-studio`, `/reminders`, `/integrations`, `/settings`) + `/mobile` preview + error/loading/not-found.
-- 19 API routes covering capture, items (process / project), projects, build-packs (multi-format export), prompts, reminders, search, stats, integrations, settings, digest, and export/delete.
+- 19 page routes (`/`, `/dashboard`, `/inbox`, `/capture`, `/ready-to-build`, `/build-packs/[id]`, `/memory-graph`, `/prompts`, `/learning`, `/job-search`, `/content-studio`, `/reminders`, `/integrations`, `/settings`, `/login`, `/share`, `/privacy`, `/terms`) + `/mobile` preview + error/loading/not-found.
+- 32 API routes covering capture, items (process / project / delete), projects (list / get / delete), build-packs (multi-format export), Instagram OAuth (connect / callback / analyze / status), the MCP server (`/api/mcp`), prompts, reminders, search, stats, integrations, settings, mobile devices, push, digest, and export/delete.
 - Full Prisma schema with 10 models and realistic seed data (8 captures, 3 prompts, 4 reminders, 12 integrations, 3 project ideas).
 - AI provider abstraction with deterministic mock fallback for every AI task.
 - 21 Vitest unit tests across scoring, utils, AI mock, capture schema, and build pack generation — all green.
