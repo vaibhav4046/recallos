@@ -7,6 +7,7 @@ import {
   fetchProfile,
   storeInstagramConnection,
 } from "@/lib/instagram";
+import { enforce } from "@/lib/ratelimit";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -15,6 +16,9 @@ export const revalidate = 0;
 // token, fetches the profile, and stores the connection server-side. Always
 // redirects back to /integrations with an ?ig= status — never leaks details.
 export async function GET(req: Request) {
+  const blocked = await enforce(req, { name: "ig-callback", limit: 20, windowMs: 60_000 });
+  if (blocked) return blocked;
+
   const url = new URL(req.url);
   const origin = url.origin;
   const back = (status: string) =>
