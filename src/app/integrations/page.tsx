@@ -149,9 +149,36 @@ export default function IntegrationsPage() {
       </div>
 
       <Card>
+        <CardHeader
+          title="Connect via MCP"
+          description="Use Musemint from Claude, Cursor, or any MCP client"
+          right={<Badge tone="success">Live</Badge>}
+        />
+        <p className="text-sm text-ink-mute">
+          Musemint exposes a Model Context Protocol server so an AI client can search your memory and
+          turn ideas into build packs in-conversation.
+        </p>
+        <div className="mt-3 rounded-lg border border-line-soft bg-bg-soft/40 p-3 font-mono text-xs text-ink-soft">
+          <div className="text-ink-mute"># add to an MCP client (HTTP transport)</div>
+          <div className="mt-1 break-all text-ink">/api/mcp</div>
+        </div>
+        <ul className="mt-3 space-y-2 text-sm text-ink-soft">
+          <li>
+            · <strong className="text-ink">Reads are open</strong> — <code>musemint_search</code> and{" "}
+            <code>musemint_list_projects</code> need no token.
+          </li>
+          <li>
+            · <strong className="text-ink">Writes are gated</strong> — <code>musemint_capture</code> and{" "}
+            <code>musemint_generate_build_pack</code> require an{" "}
+            <code>Authorization: Bearer &lt;MCP_SECRET&gt;</code> header.
+          </li>
+        </ul>
+      </Card>
+
+      <Card>
         <CardHeader title="Privacy" description="What Musemint will and won't do" />
         <ul className="space-y-2 text-sm text-ink-soft">
-          <li>· Captures live in your local SQLite DB by default. Bring your own AI key to enable cloud processing.</li>
+          <li>· Captures live in your own Postgres database. Bring your own AI key to enable cloud processing.</li>
           <li>· LinkedIn and Instagram saved posts are <strong className="text-ink">never scraped</strong>. Use the official share sheet, the Chrome extension, or screenshot OCR.</li>
           <li>· All integrations are opt-in and reversible from this page.</li>
           <li>· Export or wipe your memory any time from <a href="/settings" className="text-accent">Settings</a>.</li>

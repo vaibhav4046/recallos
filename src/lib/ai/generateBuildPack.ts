@@ -49,7 +49,7 @@ function fallbackPack(input: BuildPackInput): BuildPack {
   const slug = slugify(input.projectTitle);
   const stack = input.techStack.length
     ? input.techStack
-    : ["Next.js", "TypeScript", "Tailwind", "Prisma", "SQLite", "OpenAI / Gemini"];
+    : ["Next.js", "TypeScript", "Tailwind", "Prisma", "Postgres", "OpenAI / Gemini"];
   return {
     overview: `${input.projectTitle} — ${input.whyItMatters}. Built as a portfolio-grade ${input.difficulty.toLowerCase()} project synthesizing ${input.sourceItems.length} saved sources.`,
     problemStatement: `Builders constantly lose context across saved videos, posts, and links. ${input.projectTitle} closes that gap by transforming saved content into shipping work — a focused vertical of Musemint.`,
@@ -68,7 +68,7 @@ function fallbackPack(input: BuildPackInput): BuildPack {
       "Reminder engine for forgotten items",
     ],
     techStack: stack,
-    architecture: `Next.js App Router + RSC for the UI. Prisma + SQLite for local persistence. A pluggable AI provider layer (Gemini → OpenAI → Anthropic → Groq → mock). Capture API normalizes input from share-sheet, browser extension, and pasted URL into a single CapturedItem.`,
+    architecture: `Next.js App Router + RSC for the UI. Prisma + Postgres for persistence. A pluggable AI provider layer (Gemini → OpenAI → Anthropic → Groq → mock). Capture API normalizes input from share-sheet, browser extension, and pasted URL into a single CapturedItem.`,
     apiPlan: [
       { method: "POST", path: "/api/capture", description: "Create a captured item" },
       { method: "POST", path: "/api/items/:id/process", description: "Run AI processing" },
