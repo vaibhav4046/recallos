@@ -23,6 +23,7 @@ import {
   Database,
 } from "lucide-react";
 import { ReactNode } from "react";
+import { InstagramPanel } from "@/components/integrations/InstagramPanel";
 
 interface Integration {
   id: string;
@@ -110,6 +111,8 @@ export default function IntegrationsPage() {
           or screenshot OCR — Musemint never scrapes private accounts.
         </p>
       </header>
+
+      <InstagramPanel />
 
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         {(list ?? []).map((i) => {
