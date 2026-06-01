@@ -16,3 +16,6 @@ tsconfig.tsbuildinfo
 
 .vercel
 .env*
+
+# Local secret material — never commit
+mcp-credentials.txt

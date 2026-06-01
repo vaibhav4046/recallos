@@ -6,7 +6,7 @@ import { Badge, ScoreBar } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
-import { Hammer, Sparkles, ArrowRight, GitBranch, Clock, Cpu, Loader2 } from "lucide-react";
+import { Hammer, Sparkles, ArrowRight, GitBranch, Clock, Cpu, Loader2, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 type Project = {
@@ -25,6 +25,7 @@ type Project = {
 export default function ReadyToBuildPage() {
   const [projects, setProjects] = useState<Project[] | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const toast = useToast();
   const router = useRouter();
 
@@ -59,6 +60,21 @@ export default function ReadyToBuildPage() {
       toast({ kind: "error", title: "Build pack failed", body: err.message });
     } finally {
       setBusyId(null);
+    }
+  }
+
+  async function onDelete(projectId: string, projectTitle: string) {
+    if (!window.confirm(`Delete project "${projectTitle}"? This can't be undone.`)) return;
+    setDeletingId(projectId);
+    try {
+      const res = await fetch(`/api/projects/${projectId}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Delete failed");
+      setProjects((prev) => (prev ? prev.filter((p) => p.id !== projectId) : prev));
+      toast({ kind: "success", title: "Project deleted", body: projectTitle });
+    } catch (err: any) {
+      toast({ kind: "error", title: "Delete failed", body: err.message });
+    } finally {
+      setDeletingId(null);
     }
   }
 
@@ -146,11 +162,25 @@ export default function ReadyToBuildPage() {
                   {p.status === "building" ? "Already drafting" : "Idea"}
                 </span>
               </div>
-              <div className="mt-auto flex items-center justify-end gap-2">
+              <div className="mt-auto flex items-center justify-between gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => onDelete(p.id, p.title)}
+                  disabled={deletingId !== null || busyId !== null}
+                  aria-label={`Delete project ${p.title}`}
+                  title="Delete project"
+                >
+                  {deletingId === p.id ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                </Button>
                 <Button
                   variant="primary"
                   onClick={() => onGenerate(p.id)}
-                  disabled={busyId !== null}
+                  disabled={busyId !== null || deletingId !== null}
                 >
                   {busyId === p.id ? (
                     <>
